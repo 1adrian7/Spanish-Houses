@@ -805,13 +805,7 @@ function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, i
   return (
     <div className="property-card" style={{animationDelay:`${index*0.07}s`}} onClick={() => { setDetailId(prop.id); setPage('detail'); }}>
       <div className="card-img-wrap">
-       {prop.imgs && prop.imgs[0] && prop.imgs[0].startsWith('data:') ? (
-  <img src={prop.imgs[0]} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={prop.title}/>
-) : (
-  <div className="card-img-placeholder" style={{background:prop.bgColor}}>
-    <span>{prop.emojiBg}</span>
-  </div>
-)}
+        <div className="card-img-placeholder" style={{background:prop.bgColor}}><span>{prop.emojiBg}</span></div>
         <span className={`card-badge badge-${prop.badge==='nuevo'?'nuevo':prop.badge}`}>{prop.badge==='venta'?t.catalogue.sale:prop.badge==='alquiler'?t.catalogue.rent:'Nuevo'}</span>
         <button className={`card-fav ${isFav?'active':''}`} onClick={e => { e.stopPropagation(); toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>{isFav?'❤️':'🤍'}</button>
         {prop.has360 && <div className="card-360">360°</div>}
@@ -938,26 +932,15 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
         <div className="detail-grid">
           <div>
             <div className="gallery-main">
-              <div className="gallery-main-img" style={{background:prop.bgColor}}>
-  {prop.imgs[imgIndex] && prop.imgs[imgIndex].startsWith('data:') ? (
-    <img src={prop.imgs[imgIndex]} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={prop.title}/>
-  ) : (
-    <span style={{fontSize:100}}>{prop.imgs[imgIndex]}</span>
-  )}
-</div>
+              <div className="gallery-main-img" style={{background:prop.bgColor}}><span style={{fontSize:100}}>{prop.imgs[imgIndex]}</span></div>
               <button className="gallery-nav gallery-prev" onClick={prevImg}>‹</button>
               <button className="gallery-nav gallery-next" onClick={nextImg}>›</button>
               <div className="gallery-counter">{imgIndex+1} / {prop.imgs.length}</div>
               {prop.has360 && <button className="gallery-360-btn" onClick={() => setShow360(true)}>⟳ Tour 360°</button>}
             </div>
             <div className="gallery-thumbs">
-              {prop.imgs.map((img,i) => <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}>
-  {img && img.startsWith('data:') ? (
-    <img src={img} style={{width:'100%',height:'100%',objectFit:'cover'}} alt=""/>
-  ) : (
-    <span>{img}</span>
-  )}
-</div>
+              {prop.imgs.map((img,i) => <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}><span>{img}</span></div>)}
+            </div>
             <div style={{marginTop:'2rem'}}>
               <div className="detail-title">{prop.title}</div>
               <div className="detail-location">📍 {prop.location}</div>
@@ -1295,36 +1278,12 @@ function AdminPanel({ user, setPage, addToast }) {
   };
 
   const handleSaveProp = () => {
-  const imgs = uploadedImgs.length > 0
-    ? uploadedImgs.map(i => i.url)
-    : propForm.imgs;
-
-  const data = {
-    ...propForm,
-    price: Number(propForm.price),
-    m2: Number(propForm.m2),
-    hab: Number(propForm.hab),
-    banos: Number(propForm.banos),
-    priceLabel: `${Number(propForm.price).toLocaleString('es-ES')} €${propForm.tipo === 'alquiler' ? '/mes' : ''}`,
-    imgs: imgs,
-    emojiBg: uploadedImgs.length > 0 ? '📷' : propForm.emojiBg,
+    const data = { ...propForm, price: Number(propForm.price), m2: Number(propForm.m2), hab: Number(propForm.hab), banos: Number(propForm.banos), priceLabel: `${Number(propForm.price).toLocaleString('es-ES')} €${propForm.tipo==='alquiler'?'/mes':''}` };
+    if (!data.title || !data.price || !data.location) { addToast({icon:'⚠️',msg:'Rellena los campos obligatorios'}); return; }
+    if (editProp) { PropertyService.update(editProp.id, data); addToast({icon:'✅',msg:'Propiedad actualizada',gold:true}); }
+    else { PropertyService.create(data); addToast({icon:'✅',msg:'Propiedad creada',gold:true}); }
+    setShowForm(false); refresh();
   };
-
-  if (!data.title || !data.price || !data.location) {
-    addToast({ icon: '⚠️', msg: 'Rellena los campos obligatorios' });
-    return;
-  }
-  if (editProp) {
-    PropertyService.update(editProp.id, data);
-    addToast({ icon: '✅', msg: 'Propiedad actualizada', gold: true });
-  } else {
-    PropertyService.create(data);
-    addToast({ icon: '✅', msg: 'Propiedad creada', gold: true });
-  }
-  setShowForm(false);
-  refresh();
-};
-  
 
   const handleFileUpload = async files => {
     setUploading(true);
