@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NOVA — Portal Inmobiliario</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root{--cream:#F5F0E8;--dark:#1A1714;--gold:#C9A84C;--gold-light:#E8D5A3;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Cormorant Garamond',Georgia,serif;--font-sans:'DM Sans',sans-serif;--shadow:0 4px 32px rgba(26,23,20,0.08);--shadow-lg:0 12px 60px rgba(26,23,20,0.14);--transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
+#root{min-height:100vh;}
+/* LOADER */
+.loader-overlay{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:loaderFade 0.6s ease 1.8s forwards;}
+.loader-logo{font-family:var(--font-serif);font-size:48px;font-weight:300;color:var(--cream);letter-spacing:0.15em;opacity:0;animation:logoReveal 0.8s ease 0.3s forwards;}
+.loader-line{width:0;height:1px;background:var(--gold);margin-top:16px;animation:lineGrow 1s ease 0.8s forwards;}
+.loader-sub{font-size:11px;letter-spacing:0.3em;color:var(--warm-gray);margin-top:12px;text-transform:uppercase;opacity:0;animation:logoReveal 0.8s ease 1.2s forwards;}
+@keyframes logoReveal{to{opacity:1;}}
+@keyframes lineGrow{to{width:120px;}}
+@keyframes loaderFade{to{opacity:0;pointer-events:none;}}
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2.5rem;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:var(--transition);}
+.navbar.scrolled{height:56px;background:rgba(245,240,232,0.98);}
+.nav-logo{font-family:var(--font-serif);font-size:22px;font-weight:300;letter-spacing:0.12em;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.nav-logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;}
+.nav-links{display:flex;align-items:center;gap:2rem;}
+.nav-link{font-size:13px;letter-spacing:0.06em;color:var(--warm-gray);cursor:pointer;text-decoration:none;transition:color 0.2s;background:none;border:none;font-family:var(--font-sans);}
+.nav-link:hover,.nav-link.active{color:var(--dark);}
+.nav-fav-btn{position:relative;background:none;border:none;cursor:pointer;padding:6px;}
+.nav-fav-badge{position:absolute;top:0;right:0;background:var(--gold);color:white;font-size:9px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;}
+.nav-cta{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.nav-cta:hover{background:var(--gold);}
+.nav-user-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);padding:6px 12px;cursor:pointer;font-family:var(--font-sans);font-size:12px;color:var(--dark);transition:var(--transition);}
+.nav-user-btn:hover{border-color:var(--gold);}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:var(--dark);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;}
+/* PAGES */
+.page{min-height:100vh;padding-top:68px;animation:pageIn 0.5s ease;}
+@keyframes pageIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+/* HERO */
+.hero{height:calc(100vh - 68px);position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2C2318 0%,#1A1714 50%,#3D2E1E 100%);}
+.hero-grid{position:absolute;inset:0;opacity:0.04;background-image:linear-gradient(var(--cream) 1px,transparent 1px),linear-gradient(90deg,var(--cream) 1px,transparent 1px);background-size:60px 60px;}
+.hero-accent{position:absolute;top:20%;right:15%;width:320px;height:320px;border:1px solid rgba(201,168,76,0.2);border-radius:50%;animation:pulse 4s ease-in-out infinite;}
+.hero-accent2{position:absolute;top:20%;right:15%;width:240px;height:240px;border:1px solid rgba(201,168,76,0.12);border-radius:50%;animation:pulse 4s ease-in-out 1s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.05);opacity:0.6;}}
+.hero-content{position:relative;z-index:2;padding:0 2.5rem 5rem;max-width:900px;width:100%;}
+.hero-tag{font-size:11px;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;}
+.hero-title{font-family:var(--font-serif);font-size:clamp(42px,6vw,80px);font-weight:300;color:var(--cream);line-height:1.1;margin-bottom:1.5rem;}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-subtitle{font-size:15px;color:rgba(245,240,232,0.6);max-width:460px;line-height:1.7;margin-bottom:2.5rem;}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-hero{padding:0.9rem 2.2rem;font-size:13px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border:none;text-transform:uppercase;}
+.btn-hero-primary{background:var(--gold);color:var(--dark);}
+.btn-hero-primary:hover{background:var(--gold-light);transform:translateY(-1px);}
+.btn-hero-outline{background:transparent;color:var(--cream);border:1px solid rgba(245,240,232,0.3);}
+.btn-hero-outline:hover{border-color:var(--cream);background:rgba(245,240,232,0.05);}
+.hero-stats{display:flex;gap:3rem;margin-top:4rem;padding-top:2rem;border-top:1px solid rgba(245,240,232,0.1);}
+.hero-stat-num{font-family:var(--font-serif);font-size:32px;font-weight:300;color:var(--cream);}
+.hero-stat-label{font-size:11px;letter-spacing:0.2em;color:rgba(245,240,232,0.4);text-transform:uppercase;margin-top:4px;}
+/* CATALOGUE */
+.catalogue{padding:3rem 2.5rem;max-width:1400px;margin:0 auto;}
+.catalogue-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;}
+.catalogue-title{font-family:var(--font-serif);font-size:40px;font-weight:300;}
+.catalogue-title span{font-style:italic;color:var(--warm-gray);}
+.result-count{font-size:13px;color:var(--warm-gray);}
+/* FILTERS */
+.filters-bar{display:flex;gap:0.75rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;padding:1.25rem 1.5rem;background:var(--card-bg);border:1px solid var(--border);}
+.filter-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;}
+.filter-label{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);}
+.filter-select{border:none;border-bottom:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:13px;color:var(--dark);padding:4px 0;cursor:pointer;outline:none;appearance:none;}
+.filter-search{flex:2;min-width:200px;}
+.filter-search input{width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:13px;padding:4px 0;outline:none;color:var(--dark);}
+.filter-search input::placeholder{color:var(--warm-gray);}
+.filter-btn-apply{background:var(--dark);color:var(--cream);border:none;padding:0.6rem 1.5rem;font-size:12px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);text-transform:uppercase;transition:var(--transition);flex-shrink:0;}
+.filter-btn-apply:hover{background:var(--gold);color:var(--dark);}
+.filter-btn-clear{background:none;border:1px solid var(--border);color:var(--warm-gray);padding:0.6rem 1rem;font-size:12px;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);flex-shrink:0;}
+.filter-btn-clear:hover{border-color:var(--dark);color:var(--dark);}
+/* CARDS */
+.properties-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
+.property-card{background:var(--card-bg);border:1px solid var(--border);cursor:pointer;overflow:hidden;transition:var(--transition);animation:cardIn 0.5s ease both;}
+.property-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--gold-light);}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.card-img-wrap{position:relative;height:220px;overflow:hidden;background:#2C2318;}
+.card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform 0.6s ease;font-size:60px;}
+.property-card:hover .card-img-placeholder{transform:scale(1.04);}
+.card-badge{position:absolute;top:16px;left:16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 12px;font-weight:500;}
+.badge-venta{background:var(--dark);color:var(--cream);}
+.badge-alquiler{background:var(--gold);color:var(--dark);}
+.badge-nuevo{background:#2D6A4F;color:white;}
+.card-fav{position:absolute;top:14px;right:14px;background:rgba(245,240,232,0.9);border:none;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);border-radius:50%;font-size:15px;}
+.card-fav:hover,.card-fav.active{background:var(--dark);}
+.card-360{position:absolute;bottom:12px;right:12px;background:rgba(26,23,20,0.7);color:var(--cream);font-size:10px;letter-spacing:0.1em;padding:4px 10px;}
+.card-body{padding:1.25rem 1.5rem 1.5rem;}
+.card-price{font-family:var(--font-serif);font-size:26px;font-weight:300;margin-bottom:4px;}
+.card-price-sub{font-size:11px;color:var(--warm-gray);margin-bottom:0.75rem;letter-spacing:0.05em;}
+.card-title{font-size:14px;font-weight:500;margin-bottom:4px;}
+.card-location{font-size:12px;color:var(--warm-gray);margin-bottom:1rem;display:flex;align-items:center;gap:4px;}
+.card-details{display:flex;gap:1rem;font-size:12px;color:var(--warm-gray);padding-top:1rem;border-top:1px solid var(--border);}
+.card-actions{display:flex;gap:8px;margin-top:1rem;}
+.card-btn{flex:1;padding:0.6rem;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);border:1px solid var(--border);background:none;color:var(--dark);transition:var(--transition);}
+.card-btn:hover{background:var(--dark);color:var(--cream);border-color:var(--dark);}
+.card-btn-primary{background:var(--dark);color:var(--cream);border-color:var(--dark);}
+.card-btn-primary:hover{background:var(--gold);border-color:var(--gold);color:var(--dark);}
+/* DETAIL */
+.detail-page{max-width:1400px;margin:0 auto;padding:2rem 2.5rem 4rem;}
+.detail-back{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--warm-gray);cursor:pointer;border:none;background:none;font-family:var(--font-sans);padding:0;margin-bottom:2rem;transition:color 0.2s;}
+.detail-back:hover{color:var(--dark);}
+.detail-grid{display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start;}
+.gallery-main{position:relative;height:520px;background:#2C2318;overflow:hidden;margin-bottom:1rem;}
+.gallery-main-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(245,240,232,0.9);border:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:var(--transition);z-index:2;}
+.gallery-nav:hover{background:var(--cream);}
+.gallery-prev{left:16px;}
+.gallery-next{right:16px;}
+.gallery-counter{position:absolute;bottom:16px;right:16px;background:rgba(26,23,20,0.65);color:var(--cream);font-size:11px;padding:4px 12px;letter-spacing:0.1em;}
+.gallery-360-btn{position:absolute;bottom:16px;left:16px;background:var(--gold);color:var(--dark);border:none;padding:8px 16px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);font-weight:500;transition:var(--transition);display:flex;align-items:center;gap:6px;}
+.gallery-360-btn:hover{background:var(--gold-light);}
+.gallery-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+.gallery-thumb{width:80px;height:60px;flex-shrink:0;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;background:#2C2318;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.gallery-thumb.active{border-color:var(--gold);}
+.gallery-thumb:hover{border-color:var(--dark);}
+/* DETAIL SIDEBAR */
+.detail-sidebar{display:flex;flex-direction:column;gap:1.5rem;}
+.detail-price-card{background:var(--dark);color:var(--cream);padding:2rem;}
+.detail-badge{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;}
+.detail-price{font-family:var(--font-serif);font-size:42px;font-weight:300;line-height:1;margin-bottom:0.25rem;}
+.detail-price-note{font-size:12px;color:rgba(245,240,232,0.5);margin-bottom:1.5rem;}
+.detail-cta{width:100%;background:var(--gold);color:var(--dark);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);font-weight:500;margin-bottom:0.75rem;transition:var(--transition);}
+.detail-cta:hover{background:var(--gold-light);}
+.detail-cta-outline{background:transparent;border:1px solid rgba(245,240,232,0.25);color:var(--cream);}
+.detail-cta-outline:hover{border-color:var(--cream);background:rgba(245,240,232,0.05);}
+.detail-info-card{background:var(--card-bg);border:1px solid var(--border);padding:1.5rem;}
+.detail-info-title{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:1rem;}
+.detail-info-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:13px;}
+.detail-info-row:last-child{border-bottom:none;}
+.detail-info-label{color:var(--warm-gray);}
+.detail-info-value{font-weight:500;}
+.detail-agent-card{background:var(--card-bg);border:1px solid var(--border);padding:1.5rem;display:flex;align-items:center;gap:1rem;}
+.agent-avatar{width:52px;height:52px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:20px;font-weight:300;color:var(--cream);flex-shrink:0;}
+.agent-name{font-weight:500;font-size:14px;margin-bottom:2px;}
+.agent-role{font-size:11px;color:var(--warm-gray);}
+.agent-phone{font-size:12px;color:var(--gold);margin-top:6px;}
+.detail-title{font-family:var(--font-serif);font-size:36px;font-weight:300;margin-bottom:0.5rem;line-height:1.2;}
+.detail-location{font-size:14px;color:var(--warm-gray);margin-bottom:1.5rem;display:flex;align-items:center;gap:6px;}
+.detail-features{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem;}
+.detail-feature{background:var(--card-bg);padding:1.25rem;text-align:center;}
+.detail-feature-icon{font-size:20px;margin-bottom:6px;}
+.detail-feature-value{font-family:var(--font-serif);font-size:22px;font-weight:300;}
+.detail-feature-label{font-size:10px;letter-spacing:0.1em;color:var(--warm-gray);text-transform:uppercase;margin-top:2px;}
+.detail-section-title{font-family:var(--font-serif);font-size:22px;font-weight:300;margin-bottom:1rem;padding-top:2rem;border-top:1px solid var(--border);}
+.detail-desc{font-size:14px;line-height:1.8;color:#4A4540;max-width:640px;margin-bottom:1.5rem;}
+.amenities-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:2rem;}
+.amenity{display:flex;align-items:center;gap:8px;font-size:13px;padding:0.6rem 0;}
+.amenity-check{width:18px;height:18px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:10px;flex-shrink:0;}
+/* MAP */
+.detail-map{height:240px;background:linear-gradient(135deg,#E8E0D0,#D4C9B8);position:relative;overflow:hidden;border:1px solid var(--border);}
+.map-grid{position:absolute;inset:0;opacity:0.5;background-image:linear-gradient(rgba(26,23,20,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,23,20,0.1) 1px,transparent 1px);background-size:40px 40px;}
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);font-size:32px;animation:mapBounce 1s ease 0.5s both;}
+@keyframes mapBounce{from{transform:translate(-50%,-80%) scale(0);opacity:0;}to{transform:translate(-50%,-100%) scale(1);opacity:1;}}
+.map-label{position:absolute;top:50%;left:50%;transform:translate(-50%,10px);background:var(--dark);color:var(--cream);font-size:11px;letter-spacing:0.1em;padding:4px 12px;white-space:nowrap;}
+/* TOUR 360 */
+.tour-overlay{position:fixed;inset:0;z-index:200;background:var(--dark);display:flex;flex-direction:column;}
+.tour-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid rgba(245,240,232,0.1);flex-shrink:0;}
+.tour-title{font-family:var(--font-serif);font-size:20px;color:var(--cream);font-weight:300;}
+.tour-close{background:none;border:none;color:var(--cream);font-size:24px;cursor:pointer;padding:4px 8px;}
+.tour-viewport{flex:1;position:relative;overflow:hidden;cursor:grab;}
+.tour-viewport:active{cursor:grabbing;}
+.tour-panorama{position:absolute;top:0;height:100%;display:flex;align-items:center;transition:none;}
+.tour-element{position:absolute;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.tour-element-dot{width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;animation:tourPulse 2s infinite;}
+.tour-element-dot::after{content:'';width:8px;height:8px;background:var(--gold);border-radius:50%;}
+@keyframes tourPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.4);}50%{box-shadow:0 0 0 12px rgba(201,168,76,0);}}
+.tour-element-label{font-size:11px;letter-spacing:0.1em;color:var(--gold-light);background:rgba(26,23,20,0.8);padding:4px 10px;white-space:nowrap;}
+.tour-rooms{display:flex;gap:8px;padding:1rem 2rem;border-top:1px solid rgba(245,240,232,0.1);flex-shrink:0;overflow-x:auto;}
+.tour-room-btn{background:none;border:1px solid rgba(245,240,232,0.15);color:var(--cream);padding:6px 16px;font-size:11px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);text-transform:uppercase;transition:var(--transition);white-space:nowrap;}
+.tour-room-btn:hover,.tour-room-btn.active{background:var(--gold);border-color:var(--gold);color:var(--dark);}
+.tour-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(26,23,20,0.7);color:rgba(245,240,232,0.6);font-size:11px;letter-spacing:0.1em;padding:6px 16px;pointer-events:none;}
+/* FAVOURITES */
+.favs-page{max-width:1400px;margin:0 auto;padding:3rem 2.5rem;}
+.favs-title{font-family:var(--font-serif);font-size:40px;font-weight:300;margin-bottom:2rem;}
+.favs-empty{text-align:center;padding:5rem 2rem;}
+.favs-empty-icon{font-size:60px;margin-bottom:1rem;opacity:0.3;}
+.favs-empty-text{font-family:var(--font-serif);font-size:24px;font-weight:300;color:var(--warm-gray);margin-bottom:0.5rem;}
+.favs-empty-sub{font-size:14px;color:var(--warm-gray);margin-bottom:2rem;}
+.btn-outline{background:none;border:1px solid var(--dark);color:var(--dark);padding:0.75rem 2rem;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.btn-outline:hover{background:var(--dark);color:var(--cream);}
+/* TOAST */
+.toast-container{position:fixed;bottom:2rem;right:2rem;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--dark);color:var(--cream);padding:0.75rem 1.25rem;font-size:13px;letter-spacing:0.05em;display:flex;align-items:center;gap:10px;animation:toastIn 0.3s ease,toastOut 0.3s ease 2.7s forwards;pointer-events:all;min-width:260px;}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateY(20px);opacity:0;}}
+.toast-icon{font-size:16px;flex-shrink:0;}
+.toast-gold{background:var(--gold);color:var(--dark);}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(26,23,20,0.7);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--cream);max-width:480px;width:100%;padding:2.5rem;animation:modalIn 0.3s ease;position:relative;max-height:90vh;overflow-y:auto;}
+@keyframes modalIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-close{position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--warm-gray);}
+.modal-close:hover{color:var(--dark);}
+.modal-title{font-family:var(--font-serif);font-size:28px;font-weight:300;margin-bottom:0.25rem;}
+.modal-sub{font-size:13px;color:var(--warm-gray);margin-bottom:2rem;}
+.modal-form-group{margin-bottom:1rem;}
+.modal-label{display:block;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:6px;}
+.modal-input{width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:14px;padding:8px 0;outline:none;color:var(--dark);transition:border-color 0.2s;}
+.modal-input:focus{border-color:var(--dark);}
+.modal-dates{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.modal-submit{width:100%;background:var(--dark);color:var(--cream);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);margin-top:0.5rem;transition:var(--transition);}
+.modal-submit:hover{background:var(--gold);color:var(--dark);}
+.modal-success{text-align:center;padding:2rem 0;}
+.modal-success-icon{font-size:48px;margin-bottom:1rem;}
+.modal-success-title{font-family:var(--font-serif);font-size:26px;font-weight:300;margin-bottom:0.5rem;}
+.modal-success-sub{font-size:13px;color:var(--warm-gray);}
+.modal-error{background:rgba(155,44,44,0.08);border:1px solid rgba(155,44,44,0.2);color:#9B2C2C;padding:0.75rem 1rem;font-size:13px;margin-bottom:1rem;}
+/* ADMIN */
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 68px);}
+.admin-sidebar{background:var(--dark);padding:2rem 0;display:flex;flex-direction:column;gap:4px;}
+.admin-sidebar-title{font-size:10px;letter-spacing:0.25em;color:rgba(245,240,232,0.3);text-transform:uppercase;padding:0 1.5rem;margin-bottom:0.5rem;margin-top:1rem;}
+.admin-nav-item{display:flex;align-items:center;gap:10px;padding:0.6rem 1.5rem;font-size:13px;color:rgba(245,240,232,0.6);cursor:pointer;transition:all 0.2s;border:none;background:none;font-family:var(--font-sans);width:100%;text-align:left;}
+.admin-nav-item:hover,.admin-nav-item.active{color:var(--cream);background:rgba(245,240,232,0.08);}
+.admin-nav-item.active{border-left:2px solid var(--gold);}
+.admin-content{padding:2.5rem;overflow-y:auto;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.admin-title{font-family:var(--font-serif);font-size:32px;font-weight:300;}
+.admin-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem;}
+.admin-stat-card{background:var(--card-bg);border:1px solid var(--border);padding:1.5rem;}
+.admin-stat-num{font-family:var(--font-serif);font-size:36px;font-weight:300;margin-bottom:4px;}
+.admin-stat-label{font-size:11px;letter-spacing:0.15em;color:var(--warm-gray);text-transform:uppercase;}
+.admin-stat-trend{font-size:12px;margin-top:6px;}
+.admin-stat-up{color:var(--success);}
+.admin-stat-down{color:var(--danger);}
+.admin-table-wrap{background:var(--card-bg);border:1px solid var(--border);overflow:hidden;}
+.admin-table-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);}
+.admin-table-title{font-size:14px;font-weight:500;}
+.admin-btn{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.admin-btn:hover{background:var(--gold);color:var(--dark);}
+.admin-btn-sm{padding:0.35rem 0.8rem;font-size:11px;}
+.admin-btn-danger{background:var(--danger);color:white;}
+.admin-btn-danger:hover{background:#7B2222;}
+.admin-btn-outline{background:none;border:1px solid var(--border);color:var(--dark);}
+.admin-btn-outline:hover{border-color:var(--dark);background:var(--dark);color:var(--cream);}
+table{width:100%;border-collapse:collapse;}
+th{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);padding:0.75rem 1.5rem;text-align:left;border-bottom:1px solid var(--border);background:var(--card-bg);}
+td{padding:0.85rem 1.5rem;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(201,168,76,0.04);}
+.status-badge{display:inline-flex;align-items:center;padding:3px 10px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}
+.status-active{background:rgba(45,106,79,0.12);color:#2D6A4F;}
+.status-pending{background:rgba(201,168,76,0.15);color:#8B6914;}
+.status-inactive{background:rgba(139,132,128,0.15);color:var(--warm-gray);}
+.status-sold{background:rgba(26,23,20,0.1);color:var(--dark);}
+/* FORM in admin */
+.admin-form{display:flex;flex-direction:column;gap:1rem;}
+.admin-form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.admin-form-group{display:flex;flex-direction:column;gap:6px;}
+.admin-form-label{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--warm-gray);}
+.admin-form-input{border:1px solid var(--border);background:white;font-family:var(--font-sans);font-size:13px;padding:0.6rem 0.85rem;outline:none;color:var(--dark);transition:border-color 0.2s;}
+.admin-form-input:focus{border-color:var(--gold);}
+textarea.admin-form-input{resize:vertical;min-height:90px;}
+/* I18N SELECTOR */
+.lang-selector{display:flex;gap:4px;}
+.lang-btn{background:none;border:1px solid var(--border);padding:4px 10px;font-size:11px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);color:var(--warm-gray);transition:var(--transition);}
+.lang-btn.active{background:var(--dark);color:var(--cream);border-color:var(--dark);}
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);padding:2rem;text-align:center;cursor:pointer;transition:var(--transition);}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,0.05);}
+.upload-zone input{display:none;}
+.upload-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;}
+.upload-thumb{width:80px;height:60px;background:#2C2318;display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;overflow:hidden;}
+.upload-thumb-del{position:absolute;top:2px;right:2px;background:var(--danger);color:white;border:none;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+/* NOTIFICATIONS PANEL */
+.notif-list{display:flex;flex-direction:column;gap:8px;}
+.notif-item{background:var(--card-bg);border:1px solid var(--border);padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:12px;}
+.notif-item.unread{border-left:3px solid var(--gold);}
+.notif-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.notif-body{flex:1;}
+.notif-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.notif-msg{font-size:12px;color:var(--warm-gray);}
+.notif-time{font-size:11px;color:var(--warm-gray);margin-top:4px;}
+/* AUTH */
+.auth-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px);padding:2rem;}
+.auth-card{background:var(--card-bg);border:1px solid var(--border);padding:3rem;max-width:420px;width:100%;animation:modalIn 0.3s ease;}
+.auth-title{font-family:var(--font-serif);font-size:32px;font-weight:300;margin-bottom:0.5rem;}
+.auth-sub{font-size:13px;color:var(--warm-gray);margin-bottom:2rem;}
+.auth-tabs{display:flex;gap:0;margin-bottom:2rem;border-bottom:1px solid var(--border);}
+.auth-tab{flex:1;padding:0.75rem;font-size:13px;letter-spacing:0.06em;cursor:pointer;background:none;border:none;font-family:var(--font-sans);color:var(--warm-gray);transition:all 0.2s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.auth-tab.active{color:var(--dark);border-bottom-color:var(--gold);}
+.auth-divider{text-align:center;position:relative;margin:1.5rem 0;}
+.auth-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+.auth-divider span{background:var(--card-bg);padding:0 1rem;position:relative;font-size:12px;color:var(--warm-gray);}
+.btn-google{width:100%;background:white;border:1px solid var(--border);padding:0.75rem;font-size:13px;cursor:pointer;font-family:var(--font-sans);display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--transition);}
+.btn-google:hover{border-color:var(--dark);}
+/* PROFILE PAGE */
+.profile-page{max-width:900px;margin:0 auto;padding:3rem 2.5rem;}
+.profile-header{display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid var(--border);}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:28px;color:var(--cream);flex-shrink:0;}
+.profile-name{font-family:var(--font-serif);font-size:28px;font-weight:300;}
+.profile-email{font-size:14px;color:var(--warm-gray);margin-top:4px;}
+.profile-role{display:inline-block;margin-top:8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;background:rgba(201,168,76,0.15);color:#8B6914;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.profile-section-title{font-family:var(--font-serif);font-size:20px;font-weight:300;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(26,23,20,0.2);border-radius:3px;}
+/* RESPONSIVE */
+@media(max-width:1100px){.admin-stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:900px){.detail-grid,.admin-layout,.profile-grid{grid-template-columns:1fr;}.navbar{padding:0 1.25rem;}.nav-links{display:none;}.catalogue,.detail-page,.favs-page,.profile-page{padding:2rem 1.25rem;}.hero-title{font-size:36px;}.detail-features{grid-template-columns:repeat(2,1fr);}.amenities-grid{grid-template-columns:repeat(2,1fr);}.admin-stats-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.properties-grid{grid-template-columns:1fr;}.filters-bar{flex-direction:column;}.gallery-main{height:280px;}.admin-stats-grid{grid-template-columns:1fr;}.admin-form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ═══════════════════════════════════════════════════════════════════
+// BACKEND SIMULADO — JWT + DB + Auth + Storage + Notifications
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── Utilidades JWT ─────────────────────────────────────────────────
+const JWT = {
+  sign(payload, secret = 'nova_jwt_secret_2025') {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const body = btoa(JSON.stringify({ ...payload, iat: Date.now(), exp: Date.now() + 7*24*60*60*1000 }));
+    const sig = btoa(secret + body).substring(0, 20);
+    return `${header}.${body}.${sig}`;
+  },
+  verify(token) {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(atob(parts[1]));
+      if (payload.exp < Date.now()) return null;
+      return payload;
+    } catch { return null; }
+  },
+};
+
+// ─── Base de datos simulada (localStorage) ─────────────────────────
+const DB = {
+  get: (k, def = []) => { try { return JSON.parse(localStorage.getItem('nova_'+k)) ?? def; } catch { return def; } },
+  set: (k, v) => { localStorage.setItem('nova_'+k, JSON.stringify(v)); },
+  init() {
+    if (!this.get('initialized', false)) {
+      this.set('users', [
+        { id: 'u1', name: 'Admin Nova', email: 'admin@nova.com', password: 'admin123', role: 'ADMIN', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
+        { id: 'u2', name: 'Elena Morales', email: 'elena@nova.com', password: 'agent123', role: 'AGENT', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
+        { id: 'u3', name: 'James Wilson', email: 'james@gmail.com', password: 'user123', role: 'USER', avatar: null, createdAt: new Date().toISOString(), lang: 'en' },
+      ]);
+      this.set('properties', INITIAL_PROPERTIES);
+      this.set('contacts', [
+        { id: 'c1', name: 'Sarah Thompson', email: 'sarah@gmail.com', phone: '+44 7700 900123', propertyId: '1', message: 'Interested in the penthouse. Can I arrange a viewing?', tipo: 'visita', status: 'PENDING', createdAt: new Date(Date.now()-86400000).toISOString(), language: 'en' },
+        { id: 'c2', name: 'Klaus Müller', email: 'k.muller@web.de', phone: '+49 151 12345678', propertyId: '3', message: 'Suche nach einem Haus mit Pool. Wann ist eine Besichtigung möglich?', tipo: 'visita', status: 'CONTACTED', createdAt: new Date(Date.now()-172800000).toISOString(), language: 'de' },
+        { id: 'c3', name: 'Ana García', email: 'ana@hotmail.com', phone: '+34 666 123456', propertyId: '2', message: 'Me interesa el piso modernista. Precio negociable?', tipo: 'info', status: 'PENDING', createdAt: new Date(Date.now()-3600000).toISOString(), language: 'es' },
+      ]);
+      this.set('notifications', [
+        { id: 'n1', userId: 'u1', type: 'new_contact', title: 'Nueva solicitud de visita', message: 'Sarah Thompson quiere visitar el Ático de lujo', read: false, createdAt: new Date(Date.now()-86400000).toISOString() },
+        { id: 'n2', userId: 'u1', type: 'new_contact', title: 'Consulta de cliente', message: 'Klaus Müller pregunta por el chalet con piscina', read: false, createdAt: new Date(Date.now()-172800000).toISOString() },
+        { id: 'n3', userId: 'u1', type: 'system', title: 'Bienvenido a NOVA', message: 'Tu plataforma inmobiliaria está lista', read: true, createdAt: new Date(Date.now()-604800000).toISOString() },
+      ]);
+      this.set('subscriptions', [
+        { id: 's1', email: 'sarah@gmail.com', lang: 'en', tipo: ['venta'], maxPrice: 1000000, active: true, createdAt: new Date().toISOString() },
+      ]);
+      this.set('favorites', {});
+      this.set('initialized', true);
+    }
+  },
+};
+
+// ─── Auth Service ───────────────────────────────────────────────────
+const AuthService = {
+  login(email, password) {
+    const users = DB.get('users');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) return { error: 'Credenciales incorrectas' };
+    const { password: _, ...safeUser } = user;
+    const token = JWT.sign({ id: user.id, email: user.email, role: user.role, name: user.name });
+    return { token, user: safeUser };
+  },
+  register(name, email, password, lang = 'es') {
+    const users = DB.get('users');
+    if (users.find(u => u.email === email)) return { error: 'Este email ya está registrado' };
+    const newUser = { id: 'u' + Date.now(), name, email, password, role: 'USER', avatar: null, createdAt: new Date().toISOString(), lang };
+    DB.set('users', [...users, newUser]);
+    const { password: _, ...safeUser } = newUser;
+    const token = JWT.sign({ id: newUser.id, email, role: 'USER', name });
+    const notifs = DB.get('notifications');
+    DB.set('notifications', [...notifs, { id: 'n'+Date.now(), userId: newUser.id, type: 'welcome', title: '¡Bienvenido a NOVA!', message: 'Tu cuenta ha sido creada con éxito.', read: false, createdAt: new Date().toISOString() }]);
+    return { token, user: safeUser };
+  },
+  me(token) {
+    const payload = JWT.verify(token);
+    if (!payload) return null;
+    const users = DB.get('users');
+    const user = users.find(u => u.id === payload.id);
+    if (!user) return null;
+    const { password: _, ...safeUser } = user;
+    return safeUser;
+  },
+};
+
+// ─── Property Service ────────────────────────────────────────────────
+const PropertyService = {
+  list(filters = {}) {
+    let props = DB.get('properties', INITIAL_PROPERTIES);
+    if (filters.tipo) props = props.filter(p => p.tipo === filters.tipo);
+    if (filters.district) props = props.filter(p => p.district === filters.district);
+    if (filters.maxPrice) props = props.filter(p => p.price <= Number(filters.maxPrice));
+    if (filters.minM2) props = props.filter(p => p.m2 >= Number(filters.minM2));
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      props = props.filter(p => p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+    }
+    if (filters.status && filters.status !== 'all') props = props.filter(p => p.status === filters.status);
+    return props;
+  },
+  getById(id) { return DB.get('properties', INITIAL_PROPERTIES).find(p => p.id === String(id)); },
+  create(data) {
+    const props = DB.get('properties', INITIAL_PROPERTIES);
+    const newProp = { ...data, id: String(Date.now()), createdAt: new Date().toISOString(), status: 'ACTIVE', views: 0 };
+    DB.set('properties', [...props, newProp]);
+    return newProp;
+  },
+  update(id, data) {
+    const props = DB.get('properties', INITIAL_PROPERTIES);
+    const updated = props.map(p => p.id === String(id) ? { ...p, ...data, updatedAt: new Date().toISOString() } : p);
+    DB.set('properties', updated);
+    return updated.find(p => p.id === String(id));
+  },
+  delete(id) {
+    const props = DB.get('properties', INITIAL_PROPERTIES);
+    DB.set('properties', props.filter(p => p.id !== String(id)));
+    return { success: true };
+  },
+};
+
+// ─── Contact Service ─────────────────────────────────────────────────
+const ContactService = {
+  submit(data) {
+    const contacts = DB.get('contacts');
+    const newContact = { ...data, id: 'c'+Date.now(), status: 'PENDING', createdAt: new Date().toISOString() };
+    DB.set('contacts', [...contacts, newContact]);
+    // Simular email de notificación
+    const notifs = DB.get('notifications');
+    DB.set('notifications', [...notifs, { id: 'n'+Date.now(), userId: 'u1', type: 'new_contact', title: 'Nueva solicitud recibida', message: `${data.name} ha enviado una solicitud de ${data.tipo}`, read: false, createdAt: new Date().toISOString() }]);
+    return newContact;
+  },
+  list() { return DB.get('contacts').sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)); },
+  updateStatus(id, status) {
+    const contacts = DB.get('contacts');
+    DB.set('contacts', contacts.map(c => c.id === id ? { ...c, status } : c));
+  },
+};
+
+// ─── Favorites Service ────────────────────────────────────────────────
+const FavService = {
+  get(userId) { return DB.get('favorites')[userId] || []; },
+  toggle(userId, propId) {
+    const favs = DB.get('favorites');
+    const userFavs = favs[userId] || [];
+    favs[userId] = userFavs.includes(propId) ? userFavs.filter(f => f !== propId) : [...userFavs, propId];
+    DB.set('favorites', favs);
+    return favs[userId];
+  },
+};
+
+// ─── Notification Service ─────────────────────────────────────────────
+const NotifService = {
+  list(userId) { return DB.get('notifications').filter(n => n.userId === userId).sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt)); },
+  markRead(id) {
+    const notifs = DB.get('notifications');
+    DB.set('notifications', notifs.map(n => n.id === id ? { ...n, read: true } : n));
+  },
+  markAllRead(userId) {
+    const notifs = DB.get('notifications');
+    DB.set('notifications', notifs.map(n => n.userId === userId ? { ...n, read: true } : n));
+  },
+  unreadCount(userId) { return DB.get('notifications').filter(n => n.userId === userId && !n.read).length; },
+};
+
+// ─── Upload Service (simulado) ────────────────────────────────────────
+const UploadService = {
+  async upload(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fakeUrl = e.target.result; // base64 como "S3 URL"
+        setTimeout(() => resolve({ url: fakeUrl, name: file.name, size: file.size }), 400 + Math.random()*600);
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// I18N — 4 IDIOMAS
+// ═══════════════════════════════════════════════════════════════════
+const TRANSLATIONS = {
+  es: {
+    nav: { home:'Inicio', properties:'Propiedades', favorites:'Favoritos', services:'Servicios', contact:'Contacto', login:'Acceder', admin:'Admin', profile:'Mi perfil', logout:'Cerrar sesión' },
+    hero: { tag:'Portal Inmobiliario de Lujo · Valencia', title:'Tu próximo hogar,', titleEm:'extraordinario', subtitle:'Selección exclusiva de propiedades únicas en las mejores ubicaciones. Experiencia premium, resultados reales.', cta1:'Ver propiedades', cta2:'Hablar con un asesor', stat1:'+1.200', stat1l:'Propiedades', stat2:'98%', stat2l:'Satisfacción', stat3:'15', stat3l:'Años experiencia' },
+    catalogue: { title:'Propiedades', subtitle:'disponibles', search:'Buscar', searchPh:'Ciudad, barrio, descripción...', type:'Tipo', all:'Todos', sale:'Venta', rent:'Alquiler', zone:'Zona', allZones:'Todas', maxPrice:'Precio máx.', noLimit:'Sin límite', minM2:'M² mínimo', apply:'Buscar', clear:'Limpiar', noResults:'Sin resultados', noResultsSub:'Prueba a modificar los filtros', showAll:'Ver todas las propiedades' },
+    card: { detail:'Ver detalle', info:'Solicitar info', beds:'hab.', baths:'baños' },
+    detail: { back:'Volver al catálogo', meters:'Metros', bedrooms:'Dormitorios', bathrooms:'Baños', floor:'Planta', description:'Descripción', features:'Características', location:'Ubicación', sale:'— VENTA —', rent:'— ALQUILER —', requestVisit:'Solicitar visita', saveProperty:'Guardar propiedad', savedProperty:'En favoritos', tour360:'Tour virtual 360°', included:'Incluido', notIncluded:'No incluido', garage:'Garaje', ref:'Ref.' },
+    visit: { title:'Solicitar visita', name:'Nombre completo', email:'Email', phone:'Teléfono', date:'Fecha preferida', time:'Hora', confirm:'Confirmar visita', successTitle:'¡Visita confirmada!', successSub:'Te hemos enviado los detalles por email. Nuestro asesor te contactará para confirmar.', close:'Cerrar', namePh:'Tu nombre', phonePh:'+34 600 000 000' },
+    auth: { title:'Bienvenido', sub:'Accede a tu cuenta o regístrate', login:'Iniciar sesión', register:'Crear cuenta', email:'Email', password:'Contraseña', name:'Nombre completo', loginBtn:'Entrar', registerBtn:'Registrarse', withGoogle:'Continuar con Google', alreadyHave:'¿Ya tienes cuenta?', noAccount:'¿No tienes cuenta?' },
+    favs: { title:'Mis Favoritos', empty:'Aún no tienes favoritos', emptySub:'Guarda las propiedades que te interesen y encuéntralas aquí', explore:'Explorar propiedades' },
+    toast: { saved:'Guardado en favoritos', removed:'Eliminado de favoritos', visitOk:'¡Visita confirmada! Te esperamos', callBack:'Te llamamos en breve', loginOk:'¡Bienvenido de vuelta!', registerOk:'Cuenta creada con éxito', logoutOk:'Sesión cerrada' },
+  },
+  en: {
+    nav: { home:'Home', properties:'Properties', favorites:'Favorites', services:'Services', contact:'Contact', login:'Sign in', admin:'Admin', profile:'My profile', logout:'Sign out' },
+    hero: { tag:'Luxury Real Estate Portal · Valencia', title:'Your next home,', titleEm:'extraordinary', subtitle:'Exclusive selection of unique properties in the best locations. Premium experience, real results.', cta1:'View properties', cta2:'Talk to an advisor', stat1:'+1,200', stat1l:'Properties', stat2:'98%', stat2l:'Satisfaction', stat3:'15', stat3l:'Years experience' },
+    catalogue: { title:'Properties', subtitle:'available', search:'Search', searchPh:'City, neighbourhood, description...', type:'Type', all:'All', sale:'For sale', rent:'For rent', zone:'Area', allZones:'All areas', maxPrice:'Max. price', noLimit:'No limit', minM2:'Min. sqm', apply:'Search', clear:'Clear', noResults:'No results', noResultsSub:'Try adjusting your filters', showAll:'View all properties' },
+    card: { detail:'View details', info:'Request info', beds:'beds', baths:'baths' },
+    detail: { back:'Back to catalogue', meters:'Sqm', bedrooms:'Bedrooms', bathrooms:'Bathrooms', floor:'Floor', description:'Description', features:'Features', location:'Location', sale:'— FOR SALE —', rent:'— FOR RENT —', requestVisit:'Request a viewing', saveProperty:'Save property', savedProperty:'Saved', tour360:'Virtual 360° tour', included:'Included', notIncluded:'Not included', garage:'Garage', ref:'Ref.' },
+    visit: { title:'Request a viewing', name:'Full name', email:'Email', phone:'Phone', date:'Preferred date', time:'Time', confirm:'Confirm viewing', successTitle:'Viewing confirmed!', successSub:'We have sent you the details by email. Our agent will contact you to confirm.', close:'Close', namePh:'Your name', phonePh:'+44 7700 000000' },
+    auth: { title:'Welcome', sub:'Sign in or create an account', login:'Sign in', register:'Sign up', email:'Email', password:'Password', name:'Full name', loginBtn:'Sign in', registerBtn:'Create account', withGoogle:'Continue with Google', alreadyHave:'Already have an account?', noAccount:"Don't have an account?" },
+    favs: { title:'My Favorites', empty:'No favorites yet', emptySub:'Save properties you like and find them here', explore:'Explore properties' },
+    toast: { saved:'Saved to favorites', removed:'Removed from favorites', visitOk:'Viewing confirmed! See you there', callBack:'We will call you shortly', loginOk:'Welcome back!', registerOk:'Account created successfully', logoutOk:'Signed out' },
+  },
+  de: {
+    nav: { home:'Startseite', properties:'Immobilien', favorites:'Favoriten', services:'Dienstleistungen', contact:'Kontakt', login:'Anmelden', admin:'Admin', profile:'Mein Profil', logout:'Abmelden' },
+    hero: { tag:'Luxus-Immobilienportal · Valencia', title:'Ihr nächstes Zuhause,', titleEm:'außergewöhnlich', subtitle:'Exklusive Auswahl einzigartiger Immobilien in besten Lagen. Premium-Erfahrung, echte Ergebnisse.', cta1:'Immobilien ansehen', cta2:'Berater kontaktieren', stat1:'+1.200', stat1l:'Immobilien', stat2:'98%', stat2l:'Zufriedenheit', stat3:'15', stat3l:'Jahre Erfahrung' },
+    catalogue: { title:'Immobilien', subtitle:'verfügbar', search:'Suchen', searchPh:'Stadt, Viertel, Beschreibung...', type:'Typ', all:'Alle', sale:'Kauf', rent:'Miete', zone:'Zone', allZones:'Alle', maxPrice:'Max. Preis', noLimit:'Kein Limit', minM2:'Min. m²', apply:'Suchen', clear:'Zurücksetzen', noResults:'Keine Ergebnisse', noResultsSub:'Filter anpassen', showAll:'Alle Immobilien' },
+    card: { detail:'Details', info:'Info anfragen', beds:'Zi.', baths:'Bäder' },
+    detail: { back:'Zurück', meters:'m²', bedrooms:'Schlafzimmer', bathrooms:'Badezimmer', floor:'Etage', description:'Beschreibung', features:'Ausstattung', location:'Lage', sale:'— KAUF —', rent:'— MIETE —', requestVisit:'Besichtigung anfragen', saveProperty:'Merken', savedProperty:'Gemerkt', tour360:'Virtueller 360°-Rundgang', included:'Inklusive', notIncluded:'Nicht inklusive', garage:'Garage', ref:'Ref.' },
+    visit: { title:'Besichtigung anfragen', name:'Vollständiger Name', email:'E-Mail', phone:'Telefon', date:'Wunschdatum', time:'Uhrzeit', confirm:'Besichtigung bestätigen', successTitle:'Besichtigung bestätigt!', successSub:'Wir haben Ihnen die Details per E-Mail gesendet. Unser Makler wird sich zur Bestätigung melden.', close:'Schließen', namePh:'Ihr Name', phonePh:'+49 151 00000000' },
+    auth: { title:'Willkommen', sub:'Anmelden oder registrieren', login:'Anmelden', register:'Registrieren', email:'E-Mail', password:'Passwort', name:'Vollständiger Name', loginBtn:'Anmelden', registerBtn:'Konto erstellen', withGoogle:'Mit Google fortfahren', alreadyHave:'Haben Sie ein Konto?', noAccount:'Noch kein Konto?' },
+    favs: { title:'Meine Favoriten', empty:'Noch keine Favoriten', emptySub:'Speichern Sie Immobilien, die Sie interessieren', explore:'Immobilien erkunden' },
+    toast: { saved:'Zu Favoriten hinzugefügt', removed:'Aus Favoriten entfernt', visitOk:'Besichtigung bestätigt!', callBack:'Wir rufen Sie bald zurück', loginOk:'Willkommen zurück!', registerOk:'Konto erfolgreich erstellt', logoutOk:'Abgemeldet' },
+  },
+  nl: {
+    nav: { home:'Startpagina', properties:'Woningen', favorites:'Favorieten', services:'Diensten', contact:'Contact', login:'Inloggen', admin:'Admin', profile:'Mijn profiel', logout:'Uitloggen' },
+    hero: { tag:'Luxe Vastgoedportaal · Valencia', title:'Uw volgende thuis,', titleEm:'buitengewoon', subtitle:'Exclusieve selectie van unieke woningen op de beste locaties. Premium ervaring, echte resultaten.', cta1:'Woningen bekijken', cta2:'Spreek met adviseur', stat1:'+1.200', stat1l:'Woningen', stat2:'98%', stat2l:'Tevredenheid', stat3:'15', stat3l:'Jaar ervaring' },
+    catalogue: { title:'Woningen', subtitle:'beschikbaar', search:'Zoeken', searchPh:'Stad, wijk, omschrijving...', type:'Type', all:'Alles', sale:'Koop', rent:'Huur', zone:'Zone', allZones:'Alles', maxPrice:'Max. prijs', noLimit:'Geen limiet', minM2:'Min. m²', apply:'Zoeken', clear:'Wissen', noResults:'Geen resultaten', noResultsSub:'Pas de filters aan', showAll:'Alle woningen' },
+    card: { detail:'Bekijk details', info:'Info aanvragen', beds:'slaapk.', baths:'badk.' },
+    detail: { back:'Terug naar catalogus', meters:'m²', bedrooms:'Slaapkamers', bathrooms:'Badkamers', floor:'Verdieping', description:'Beschrijving', features:'Kenmerken', location:'Locatie', sale:'— KOOP —', rent:'— HUUR —', requestVisit:'Bezichtiging aanvragen', saveProperty:'Opslaan', savedProperty:'Opgeslagen', tour360:'Virtuele 360° tour', included:'Inbegrepen', notIncluded:'Niet inbegrepen', garage:'Garage', ref:'Ref.' },
+    visit: { title:'Bezichtiging aanvragen', name:'Volledige naam', email:'E-mail', phone:'Telefoon', date:'Voorkeursdatum', time:'Tijd', confirm:'Bezichtiging bevestigen', successTitle:'Bezichtiging bevestigd!', successSub:'We hebben u de details per e-mail gestuurd. Onze agent neemt contact op.', close:'Sluiten', namePh:'Uw naam', phonePh:'+31 6 00000000' },
+    auth: { title:'Welkom', sub:'Log in of maak een account aan', login:'Inloggen', register:'Registreren', email:'E-mail', password:'Wachtwoord', name:'Volledige naam', loginBtn:'Inloggen', registerBtn:'Account aanmaken', withGoogle:'Doorgaan met Google', alreadyHave:'Al een account?', noAccount:'Nog geen account?' },
+    favs: { title:'Mijn Favorieten', empty:'Nog geen favorieten', emptySub:'Sla woningen op die u interesseren', explore:'Woningen verkennen' },
+    toast: { saved:'Opgeslagen in favorieten', removed:'Verwijderd uit favorieten', visitOk:'Bezichtiging bevestigd!', callBack:'We bellen u snel terug', loginOk:'Welkom terug!', registerOk:'Account succesvol aangemaakt', logoutOk:'Uitgelogd' },
+  },
+};
+
+const useT = (lang) => TRANSLATIONS[lang] || TRANSLATIONS.es;
+
+// ═══════════════════════════════════════════════════════════════════
+// DATOS INICIALES
+// ═══════════════════════════════════════════════════════════════════
+const INITIAL_PROPERTIES = [
+  { id:'1', title:'Ático de lujo con vistas al mar', tipo:'venta', price:895000, priceLabel:'895.000 €', priceNote:'Precio de venta', m2:210, hab:4, banos:3, parking:true, planta:'Ático 8ª', location:'Paseo Marítimo, Valencia', district:'Valencia', badge:'venta', desc:'Espectacular ático en primera línea de mar con amplias terrazas de 80 m² y panorámicas vistas al Mediterráneo. Acabados de alta calidad con suelos de mármol italiano, cocina de diseño y domótica integrada. Comunidad con piscina, gimnasio y conserjería 24h.', emojiBg:'🌊', bgColor:'#1A3A5C', imgs:['🌊','🛋️','🍽️','🛁','🌇'], imgLabels:['Salón principal','Comedor','Cocina','Baño master','Terraza'], amenities:['Piscina comunitaria','Gimnasio','Conserjería 24h','Domótica','Garaje doble','Trastero','Aire acondicionado','Suelos mármol','Cocina de diseño','Ascensor','Terraza 80m²','Vistas al mar'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:false, status:'ACTIVE', views:248, rooms360:['Salón','Cocina','Dormitorio','Terraza'], createdAt:'2025-01-15T10:00:00Z' },
+  { id:'2', title:'Piso modernista Ensanche', tipo:'venta', price:420000, priceLabel:'420.000 €', priceNote:'Precio de venta', m2:145, hab:3, banos:2, parking:false, planta:'3ª', location:'Gran Vía, Valencia', district:'Valencia', badge:'venta', desc:'Elegante piso en edificio modernista completamente reformado manteniendo detalles originales: molduras, parquet de madera y techos altos de 3,20 m. Distribución luminosa con grandes ventanales a Gran Vía.', emojiBg:'🏛️', bgColor:'#3D2E1E', imgs:['🏛️','🛏️','🛁','🍳','🌆'], imgLabels:['Salón','Dormitorio principal','Baño','Cocina','Vistas'], amenities:['Techos 3.20m','Parquet original','Molduras','Cocina americana','Ascensor','Patio interior','Doble acristalamiento','Gas natural','Fibra óptica'], has360:true, agent:{ name:'Carlos Vega', role:'Asesor Senior', initial:'CV' }, featured:false, nuevo:false, status:'ACTIVE', views:134, rooms360:['Salón','Dormitorio','Baño','Cocina'], createdAt:'2025-02-01T09:00:00Z' },
+  { id:'3', title:'Chalet independiente con piscina', tipo:'venta', price:780000, priceLabel:'780.000 €', priceNote:'Precio de venta', m2:350, hab:5, banos:4, parking:true, planta:'Unifamiliar', location:'La Moraleja, Valencia', district:'Periferia', badge:'venta', desc:'Impresionante chalet moderno en urbanización privada con piscina de 12 metros, jardín de 600 m² y garaje para 3 vehículos. La vivienda dispone de salón-comedor de 80 m², cocina office, bodega y zona de servicio independiente.', emojiBg:'🏡', bgColor:'#2D4A2E', imgs:['🏡','🏊','🌿','🍷','🛏️'], imgLabels:['Fachada','Piscina','Jardín','Bodega','Suite principal'], amenities:['Piscina privada 12m','Jardín 600m²','Garaje 3 vehículos','Bodega','Zona servicio','Alarma','Domótica','Riego automático','BBQ exterior','Jacuzzi','Gimnasio','Trastero'], has360:true, agent:{ name:'Isabel Fuentes', role:'Agente Premium', initial:'IF' }, featured:false, nuevo:true, status:'ACTIVE', views:312, rooms360:['Salón','Piscina','Jardín','Suite'], createdAt:'2025-02-20T11:00:00Z' },
+  { id:'4', title:'Loft industrial Ruzafa', tipo:'alquiler', price:1450, priceLabel:'1.450 €/mes', priceNote:'Mensual + IVA', m2:95, hab:1, banos:1, parking:false, planta:'1ª', location:'Ruzafa, Valencia', district:'Valencia', badge:'alquiler', desc:'Espectacular loft de estilo industrial en el corazón de Ruzafa. Techos con vigas de acero visto a 5 metros de altura, suelos de microcemento y ventanales de 3 metros.', emojiBg:'🏗️', bgColor:'#4A3825', imgs:['🏗️','🛏️','🍳','🚿','🌃'], imgLabels:['Espacio principal','Mezzanine','Cocina','Baño','Vista nocturna'], amenities:['Techos 5 metros','Microcemento','Vigas acero visto','Mezzanine','Cocina equipada','Fibra óptica','Aire split','Portero automático'], has360:false, agent:{ name:'Marcos Gil', role:'Asesor Alquiler', initial:'MG' }, featured:false, nuevo:true, status:'ACTIVE', views:89, rooms360:[], createdAt:'2025-03-01T08:00:00Z' },
+  { id:'5', title:'Apartamento con terraza Cabanyal', tipo:'alquiler', price:950, priceLabel:'950 €/mes', priceNote:'Mensual', m2:78, hab:2, banos:1, parking:false, planta:'4ª', location:'Cabanyal, Valencia', district:'Valencia', badge:'alquiler', desc:'Luminoso apartamento reformado con terraza privada de 25 m² y vistas parciales al mar. A 5 minutos caminando de la playa.', emojiBg:'🌅', bgColor:'#1A3A4C', imgs:['🌅','🛏️','🌿','🍽️','🌊'], imgLabels:['Terraza','Dormitorio','Terraza tarde','Salón','Playa cercana'], amenities:['Terraza 25m²','Vistas al mar','5 min playa','Ascensor','Reformado 2023','Aire acondicionado','Calefacción','Fibra óptica'], has360:false, agent:{ name:'Laura Sanz', role:'Asesora Alquiler', initial:'LS' }, featured:false, nuevo:false, status:'ACTIVE', views:67, rooms360:[], createdAt:'2025-03-10T10:00:00Z' },
+  { id:'6', title:'Penthouse minimalista Campanar', tipo:'venta', price:560000, priceLabel:'560.000 €', priceNote:'Precio de venta', m2:175, hab:3, banos:2, parking:true, planta:'Ático 7ª', location:'Campanar, Valencia', district:'Valencia', badge:'nuevo', desc:'Penthouse de nueva construcción con acabados minimalistas de primer nivel. Grandes terrazas con vistas 360° a la ciudad y al Parque de Cabecera. Sistema domótico KNX, ventilación VMC y certificación energética A.', emojiBg:'🏙️', bgColor:'#2C2C3E', imgs:['🏙️','🛋️','🛏️','🧖','🌃'], imgLabels:['Terraza principal','Salón','Suite','Baño spa','Vista nocturna'], amenities:['Certificación A','Domótica KNX','VMC','Piscina comunitaria','Garaje','Trastero','Suelos porcelánico','Cocina Bulthaup','Baño spa','Terrazas 60m²','Vistas 360°','Obra nueva'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:true, status:'ACTIVE', views:201, rooms360:['Salón','Terraza','Dormitorio','Baño'], createdAt:'2025-03-15T12:00:00Z' },
+];
+
+// ─── Init DB ──────────────────────────────────────────────────────
+DB.init();
+
+// ═══════════════════════════════════════════════════════════════════
+// HOOKS
+// ═══════════════════════════════════════════════════════════════════
+function useAuth() {
+  const [token, setToken] = useState(() => localStorage.getItem('nova_token'));
+  const [user, setUser] = useState(() => {
+    const t = localStorage.getItem('nova_token');
+    return t ? AuthService.me(t) : null;
+  });
+
+  const login = useCallback((email, password) => {
+    const res = AuthService.login(email, password);
+    if (res.error) return res;
+    localStorage.setItem('nova_token', res.token);
+    setToken(res.token);
+    setUser(res.user);
+    return res;
+  }, []);
+
+  const register = useCallback((name, email, password, lang) => {
+    const res = AuthService.register(name, email, password, lang);
+    if (res.error) return res;
+    localStorage.setItem('nova_token', res.token);
+    setToken(res.token);
+    setUser(res.user);
+    return res;
+  }, []);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('nova_token');
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  return { user, token, login, register, logout, isAdmin: user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+function ToastContainer({ toasts }) {
+  return (
+    <div className="toast-container">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast ${t.gold ? 'toast-gold' : ''}`}>
+          <span className="toast-icon">{t.icon}</span>
+          <span>{t.msg}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LANG SELECTOR
+// ═══════════════════════════════════════════════════════════════════
+function LangSelector({ lang, setLang }) {
+  const langs = ['es','en','de','nl'];
+  const flags = { es:'🇪🇸', en:'🇬🇧', de:'🇩🇪', nl:'🇳🇱' };
+  return (
+    <div className="lang-selector">
+      {langs.map(l => (
+        <button key={l} className={`lang-btn ${lang === l ? 'active' : ''}`} onClick={() => setLang(l)}>
+          {flags[l]} {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVBAR
+// ═══════════════════════════════════════════════════════════════════
+function Navbar({ page, setPage, favCount, user, logout, lang, setLang, notifCount, addToast, t }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <div className="nav-logo" onClick={() => setPage('home')}>
+        <div className="nav-logo-dot"/>
+        NOVA
+      </div>
+      <div className="nav-links">
+        <button className={`nav-link ${page==='home'?'active':''}`} onClick={() => setPage('home')}>{t.nav.home}</button>
+        <button className={`nav-link ${page==='catalogue'?'active':''}`} onClick={() => setPage('catalogue')}>{t.nav.properties}</button>
+        <button className={`nav-link ${page==='favs'?'active':''}`} onClick={() => setPage('favs')}>{t.nav.favorites}</button>
+        {user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' ? (
+          <button className={`nav-link ${page==='admin'?'active':''}`} onClick={() => setPage('admin')} style={{color:'var(--gold)'}}>⚙ {t.nav.admin}</button>
+        ) : null}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}>
+        <LangSelector lang={lang} setLang={setLang}/>
+        <button className="nav-fav-btn" onClick={() => setPage('favs')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill={favCount>0?'#C9A84C':'none'} stroke={favCount>0?'#C9A84C':'currentColor'} strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          {favCount > 0 && <span className="nav-fav-badge">{favCount}</span>}
+        </button>
+        {user ? (
+          <div style={{position:'relative'}}>
+            <button className="nav-user-btn" onClick={() => setShowUserMenu(m => !m)}>
+              <div className="nav-avatar">{user.name.substring(0,2).toUpperCase()}</div>
+              <span>{user.name.split(' ')[0]}</span>
+              {notifCount > 0 && <span style={{background:'var(--gold)',color:'white',fontSize:9,width:16,height:16,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:500}}>{notifCount}</span>}
+              <span style={{fontSize:10}}>▾</span>
+            </button>
+            {showUserMenu && (
+              <div style={{position:'absolute',right:0,top:'calc(100% + 8px)',background:'var(--cream)',border:'1px solid var(--border)',minWidth:180,zIndex:200,boxShadow:'var(--shadow-lg)'}}>
+                <button className="nav-link" style={{display:'block',width:'100%',padding:'0.75rem 1rem',textAlign:'left',borderBottom:'1px solid var(--border)'}} onClick={() => { setPage('profile'); setShowUserMenu(false); }}>👤 {t.nav.profile}</button>
+                <button className="nav-link" style={{display:'block',width:'100%',padding:'0.75rem 1rem',textAlign:'left',borderBottom:'1px solid var(--border)'}} onClick={() => { setPage('notifications'); setShowUserMenu(false); }}>🔔 Notificaciones {notifCount > 0 && `(${notifCount})`}</button>
+                {(user.role==='ADMIN'||user.role==='SUPER_ADMIN') && <button className="nav-link" style={{display:'block',width:'100%',padding:'0.75rem 1rem',textAlign:'left',borderBottom:'1px solid var(--border)',color:'var(--gold)'}} onClick={() => { setPage('admin'); setShowUserMenu(false); }}>⚙ {t.nav.admin}</button>}
+                <button className="nav-link" style={{display:'block',width:'100%',padding:'0.75rem 1rem',textAlign:'left',color:'var(--danger)'}} onClick={() => { logout(); setShowUserMenu(false); addToast({icon:'👋',msg:t.toast.logoutOk}); }}>↩ {t.nav.logout}</button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button className="nav-cta" onClick={() => setPage('auth')}>{t.nav.login}</button>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOUR 360°
+// ═══════════════════════════════════════════════════════════════════
+function Tour360({ property, onClose }) {
+  const [activeRoom, setActiveRoom] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const startOff = useRef(0);
+  const roomColors = [
+    'linear-gradient(to right,#1a0f05,#2C2318,#3D2E1E,#4A3825,#5C4A35,#4A3825,#3D2E1E,#2C2318)',
+    'linear-gradient(to right,#0f1a25,#1A2C3D,#253D52,#2C4A5C,#1A3548,#0f1a25,#1A2C3D,#253D52)',
+    'linear-gradient(to right,#1a1a0f,#2C2C18,#3D3D2E,#4A4A3A,#3D3D2E,#2C2C18,#1a1a0f,#2C2C18)',
+    'linear-gradient(to right,#0f1a0f,#1A2C1A,#253D25,#2C4A2C,#1A3A1A,#0f1a0f,#1A2C1A,#253D25)',
+  ];
+  const hotspots = [
+    [{left:'20%',top:'45%',label:'Ventana'},{left:'55%',top:'55%',label:'Sofá'},{left:'80%',top:'40%',label:'TV'}],
+    [{left:'25%',top:'50%',label:'Isla'},{left:'60%',top:'40%',label:'Horno'},{left:'75%',top:'55%',label:'Nevera'}],
+    [{left:'30%',top:'60%',label:'Cama'},{left:'65%',top:'45%',label:'Armario'}],
+    [{left:'40%',top:'50%',label:'Jacuzzi'},{left:'70%',top:'40%',label:'Ducha'}],
+  ];
+  const onMouseDown = e => { dragging.current=true; startX.current=e.clientX; startOff.current=offset; };
+  const onMouseMove = e => { if(!dragging.current)return; setOffset(startOff.current+(e.clientX-startX.current)); };
+  const onMouseUp = () => { dragging.current=false; };
+  const onTouchStart = e => { dragging.current=true; startX.current=e.touches[0].clientX; startOff.current=offset; };
+  const onTouchMove = e => { if(!dragging.current)return; setOffset(startOff.current+(e.touches[0].clientX-startX.current)); };
+  return (
+    <div className="tour-overlay">
+      <div className="tour-header">
+        <div>
+          <div className="tour-title">{property.title}</div>
+          <div style={{fontSize:12,color:'rgba(245,240,232,0.4)',letterSpacing:'0.1em',marginTop:4}}>TOUR VIRTUAL 360°</div>
+        </div>
+        <button className="tour-close" onClick={onClose}>✕</button>
+      </div>
+      <div className="tour-viewport" onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onMouseUp}>
+        <div className="tour-panorama" style={{width:3000,background:roomColors[activeRoom%roomColors.length],left:offset%3000}}>
+          <div style={{position:'absolute',inset:0,opacity:0.3,backgroundImage:"url(\"data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z' fill='%23fff' fill-opacity='.03'/%3E%3C/svg%3E\")"}}/>
+          <div style={{position:'absolute',bottom:'15%',left:'5%',right:'5%',height:'30%',background:'rgba(0,0,0,0.3)',borderRadius:2}}/>
+          <div style={{position:'absolute',top:'30%',left:'10%',width:'25%',height:'40%',border:'1px solid rgba(255,255,255,0.05)'}}/>
+          <div style={{position:'absolute',top:'25%',left:'45%',width:'20%',height:'45%',border:'1px solid rgba(255,255,255,0.04)'}}/>
+        </div>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none'}}>
+          {(hotspots[activeRoom%hotspots.length]||[]).map((h,i) => (
+            <div key={i} className="tour-element" style={{left:h.left,top:h.top}}>
+              <div className="tour-element-dot"/>
+              <div className="tour-element-label">{h.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="tour-hint">← Arrastra para explorar →</div>
+      </div>
+      <div className="tour-rooms">
+        {(property.rooms360||[]).map((r,i) => (
+          <button key={i} className={`tour-room-btn ${activeRoom===i?'active':''}`} onClick={() => { setActiveRoom(i); setOffset(0); }}>{r}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VISIT MODAL
+// ═══════════════════════════════════════════════════════════════════
+function VisitModal({ property, onClose, addToast, t, user }) {
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState({ name: user?.name||'', email: user?.email||'', phone:'', date:'', time:'10:00' });
+  const handleSubmit = e => {
+    e.preventDefault();
+    ContactService.submit({ ...form, propertyId: property.id, message:`Solicitud de visita para: ${property.title}`, tipo:'visita', language:'es' });
+    setSuccess(true);
+    addToast({ icon:'✅', msg: t.toast.visitOk, gold:true });
+  };
+  return (
+    <div className="modal-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
+      <div className="modal">
+        <button className="modal-close" onClick={onClose}>✕</button>
+        {!success ? (
+          <>
+            <div className="modal-title">{t.visit.title}</div>
+            <div className="modal-sub">{property.title}</div>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-form-group"><label className="modal-label">{t.visit.name}</label><input className="modal-input" required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder={t.visit.namePh}/></div>
+              <div className="modal-form-group"><label className="modal-label">{t.visit.email}</label><input className="modal-input" type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="tu@email.com"/></div>
+              <div className="modal-form-group"><label className="modal-label">{t.visit.phone}</label><input className="modal-input" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder={t.visit.phonePh}/></div>
+              <div className="modal-dates">
+                <div className="modal-form-group"><label className="modal-label">{t.visit.date}</label><input className="modal-input" type="date" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/></div>
+                <div className="modal-form-group"><label className="modal-label">{t.visit.time}</label><select className="modal-input" value={form.time} onChange={e=>setForm({...form,time:e.target.value})}>{['09:00','10:00','11:00','12:00','16:00','17:00','18:00'].map(h=><option key={h}>{h}</option>)}</select></div>
+              </div>
+              <button type="submit" className="modal-submit">{t.visit.confirm}</button>
+            </form>
+          </>
+        ) : (
+          <div className="modal-success">
+            <div className="modal-success-icon">🎉</div>
+            <div className="modal-success-title">{t.visit.successTitle}</div>
+            <div className="modal-success-sub">{t.visit.successSub}</div>
+            <button className="modal-submit" style={{marginTop:'2rem'}} onClick={onClose}>{t.visit.close}</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROPERTY CARD
+// ═══════════════════════════════════════════════════════════════════
+function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, index, t, user }) {
+  const isFav = favs.includes(prop.id);
+  return (
+    <div className="property-card" style={{animationDelay:`${index*0.07}s`}} onClick={() => { setDetailId(prop.id); setPage('detail'); }}>
+      <div className="card-img-wrap">
+        <div className="card-img-placeholder" style={{background:prop.bgColor}}><span>{prop.emojiBg}</span></div>
+        <span className={`card-badge badge-${prop.badge==='nuevo'?'nuevo':prop.badge}`}>{prop.badge==='venta'?t.catalogue.sale:prop.badge==='alquiler'?t.catalogue.rent:'Nuevo'}</span>
+        <button className={`card-fav ${isFav?'active':''}`} onClick={e => { e.stopPropagation(); toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>{isFav?'❤️':'🤍'}</button>
+        {prop.has360 && <div className="card-360">360°</div>}
+      </div>
+      <div className="card-body">
+        <div className="card-price">{prop.priceLabel}</div>
+        <div className="card-price-sub">{prop.priceNote}</div>
+        <div className="card-title">{prop.title}</div>
+        <div className="card-location">📍 {prop.location}</div>
+        <div className="card-details">
+          <span>🛏 {prop.hab} {t.card.beds}</span>
+          <span>🚿 {prop.banos} {t.card.baths}</span>
+          <span>📐 {prop.m2} m²</span>
+          {prop.parking && <span>🚗</span>}
+        </div>
+        <div className="card-actions" onClick={e=>e.stopPropagation()}>
+          <button className="card-btn" onClick={() => { setDetailId(prop.id); setPage('detail'); }}>{t.card.detail}</button>
+          <button className="card-btn card-btn-primary" onClick={e => { e.stopPropagation(); setDetailId(prop.id); setPage('detail'); }}>{t.card.info}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CATALOGUE
+// ═══════════════════════════════════════════════════════════════════
+function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, user }) {
+  const [filters, setFilters] = useState({tipo:'',district:'',maxPrice:'',minM2:'',search:''});
+  const [applied, setApplied] = useState({tipo:'',district:'',maxPrice:'',minM2:'',search:''});
+  const filtered = useMemo(() => PropertyService.list(applied), [applied]);
+  const apply = () => { setApplied({...filters}); };
+  const clear = () => { const e={tipo:'',district:'',maxPrice:'',minM2:'',search:''}; setFilters(e); setApplied(e); };
+  return (
+    <div className="catalogue page">
+      <div className="catalogue-header">
+        <div><div className="catalogue-title">{t.catalogue.title} <span>{t.catalogue.subtitle}</span></div></div>
+        <div className="result-count">{filtered.length} resultado{filtered.length!==1?'s':''}</div>
+      </div>
+      <div className="filters-bar">
+        <div className="filter-search">
+          <div className="filter-label">{t.catalogue.search}</div>
+          <input placeholder={t.catalogue.searchPh} value={filters.search} onChange={e=>setFilters({...filters,search:e.target.value})} onKeyDown={e=>e.key==='Enter'&&apply()}/>
+        </div>
+        <div className="filter-group">
+          <div className="filter-label">{t.catalogue.type}</div>
+          <select className="filter-select" value={filters.tipo} onChange={e=>setFilters({...filters,tipo:e.target.value})}>
+            <option value="">{t.catalogue.all}</option>
+            <option value="venta">{t.catalogue.sale}</option>
+            <option value="alquiler">{t.catalogue.rent}</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <div className="filter-label">{t.catalogue.zone}</div>
+          <select className="filter-select" value={filters.district} onChange={e=>setFilters({...filters,district:e.target.value})}>
+            <option value="">{t.catalogue.allZones}</option>
+            <option value="Valencia">Valencia</option>
+            <option value="Periferia">Periferia</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <div className="filter-label">{t.catalogue.maxPrice}</div>
+          <select className="filter-select" value={filters.maxPrice} onChange={e=>setFilters({...filters,maxPrice:e.target.value})}>
+            <option value="">{t.catalogue.noLimit}</option>
+            <option value="500000">500.000 €</option>
+            <option value="700000">700.000 €</option>
+            <option value="1000000">1.000.000 €</option>
+            <option value="2000">2.000 €/mes</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <div className="filter-label">{t.catalogue.minM2}</div>
+          <select className="filter-select" value={filters.minM2} onChange={e=>setFilters({...filters,minM2:e.target.value})}>
+            <option value="">{t.catalogue.noLimit}</option>
+            <option value="80">80 m²</option>
+            <option value="120">120 m²</option>
+            <option value="200">200 m²</option>
+          </select>
+        </div>
+        <button className="filter-btn-apply" onClick={apply}>{t.catalogue.apply}</button>
+        <button className="filter-btn-clear" onClick={clear}>{t.catalogue.clear}</button>
+      </div>
+      {filtered.length===0 ? (
+        <div style={{textAlign:'center',padding:'5rem 2rem'}}>
+          <div style={{fontSize:60,marginBottom:'1rem',opacity:0.3}}>🔍</div>
+          <div style={{fontFamily:'var(--font-serif)',fontSize:24,fontWeight:300,color:'var(--warm-gray)',marginBottom:'0.5rem'}}>{t.catalogue.noResults}</div>
+          <div style={{fontSize:14,color:'var(--warm-gray)',marginBottom:'2rem'}}>{t.catalogue.noResultsSub}</div>
+          <button className="btn-outline" onClick={clear}>{t.catalogue.showAll}</button>
+        </div>
+      ) : (
+        <div className="properties-grid">
+          {filtered.map((p,i) => <PropertyCard key={p.id} prop={p} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPage} addToast={addToast} index={i} t={t} user={user}/>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DETAIL PAGE
+// ═══════════════════════════════════════════════════════════════════
+function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
+  const [prop, setProp] = useState(() => PropertyService.getById(id));
+  const [imgIndex, setImgIndex] = useState(0);
+  const [show360, setShow360] = useState(false);
+  const [showVisit, setShowVisit] = useState(false);
+  const isFav = favs.includes(prop?.id);
+
+  useEffect(() => {
+    const p = PropertyService.getById(id);
+    if (p) { PropertyService.update(id, { views: (p.views||0)+1 }); setProp({...p, views:(p.views||0)+1}); }
+  }, [id]);
+
+  if (!prop) return null;
+  const prevImg = () => setImgIndex(i => (i-1+prop.imgs.length)%prop.imgs.length);
+  const nextImg = () => setImgIndex(i => (i+1)%prop.imgs.length);
+
+  return (
+    <div className="page">
+      {show360 && <Tour360 property={prop} onClose={() => setShow360(false)}/>}
+      {showVisit && <VisitModal property={prop} onClose={() => setShowVisit(false)} addToast={addToast} t={t} user={user}/>}
+      <div className="detail-page">
+        <button className="detail-back" onClick={() => setPage('catalogue')}>← {t.detail.back}</button>
+        <div className="detail-grid">
+          <div>
+            <div className="gallery-main">
+              <div className="gallery-main-img" style={{background:prop.bgColor}}><span style={{fontSize:100}}>{prop.imgs[imgIndex]}</span></div>
+              <button className="gallery-nav gallery-prev" onClick={prevImg}>‹</button>
+              <button className="gallery-nav gallery-next" onClick={nextImg}>›</button>
+              <div className="gallery-counter">{imgIndex+1} / {prop.imgs.length}</div>
+              {prop.has360 && <button className="gallery-360-btn" onClick={() => setShow360(true)}>⟳ Tour 360°</button>}
+            </div>
+            <div className="gallery-thumbs">
+              {prop.imgs.map((img,i) => <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}><span>{img}</span></div>)}
+            </div>
+            <div style={{marginTop:'2rem'}}>
+              <div className="detail-title">{prop.title}</div>
+              <div className="detail-location">📍 {prop.location}</div>
+              <div className="detail-features">
+                <div className="detail-feature"><div className="detail-feature-icon">📐</div><div className="detail-feature-value">{prop.m2}</div><div className="detail-feature-label">{t.detail.meters}</div></div>
+                <div className="detail-feature"><div className="detail-feature-icon">🛏</div><div className="detail-feature-value">{prop.hab}</div><div className="detail-feature-label">{t.detail.bedrooms}</div></div>
+                <div className="detail-feature"><div className="detail-feature-icon">🚿</div><div className="detail-feature-value">{prop.banos}</div><div className="detail-feature-label">{t.detail.bathrooms}</div></div>
+                <div className="detail-feature"><div className="detail-feature-icon">🏢</div><div className="detail-feature-value" style={{fontSize:14}}>{prop.planta}</div><div className="detail-feature-label">{t.detail.floor}</div></div>
+              </div>
+              <div className="detail-section-title">{t.detail.description}</div>
+              <div className="detail-desc">{prop.desc}</div>
+              <div className="detail-section-title">{t.detail.features}</div>
+              <div className="amenities-grid">{prop.amenities.map((a,i) => <div key={i} className="amenity"><div className="amenity-check">✓</div>{a}</div>)}</div>
+              <div className="detail-section-title">{t.detail.location}</div>
+              <div className="detail-map">
+                <div className="map-grid"/>
+                <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity:0.4}}>
+                  <line x1="0" y1="60%" x2="100%" y2="60%" stroke="#8B8480" strokeWidth="12"/>
+                  <line x1="0" y1="30%" x2="100%" y2="40%" stroke="#8B8480" strokeWidth="6"/>
+                  <line x1="30%" y1="0" x2="35%" y2="100%" stroke="#8B8480" strokeWidth="8"/>
+                  <line x1="65%" y1="0" x2="60%" y2="100%" stroke="#8B8480" strokeWidth="5"/>
+                </svg>
+                <div className="map-pin">📍</div>
+                <div className="map-label">{prop.location}</div>
+              </div>
+            </div>
+          </div>
+          <div className="detail-sidebar">
+            <div className="detail-price-card">
+              <div className="detail-badge">{prop.tipo==='venta'?t.detail.sale:t.detail.rent}</div>
+              <div className="detail-price">{prop.priceLabel}</div>
+              <div className="detail-price-note">{prop.priceNote}</div>
+              <button className="detail-cta" onClick={() => setShowVisit(true)}>{t.detail.requestVisit}</button>
+              <button className="detail-cta detail-cta-outline" onClick={() => { toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>
+                {isFav ? `❤️ ${t.detail.savedProperty}` : `🤍 ${t.detail.saveProperty}`}
+              </button>
+              {prop.has360 && <button className="detail-cta detail-cta-outline" style={{marginTop:4}} onClick={() => setShow360(true)}>⟳ {t.detail.tour360}</button>}
+            </div>
+            <div className="detail-info-card">
+              <div className="detail-info-title">Detalles del inmueble</div>
+              <div className="detail-info-row"><span className="detail-info-label">Tipo</span><span className="detail-info-value">{prop.tipo==='venta'?t.catalogue.sale:t.catalogue.rent}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.meters}</span><span className="detail-info-value">{prop.m2} m²</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.bedrooms}</span><span className="detail-info-value">{prop.hab}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.bathrooms}</span><span className="detail-info-value">{prop.banos}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.floor}</span><span className="detail-info-value">{prop.planta}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.garage}</span><span className="detail-info-value">{prop.parking?t.detail.included:t.detail.notIncluded}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.ref}</span><span className="detail-info-value">NV-{String(prop.id).padStart(4,'0')}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">👁 Visitas</span><span className="detail-info-value">{prop.views||0}</span></div>
+            </div>
+            <div className="detail-agent-card">
+              <div className="agent-avatar">{prop.agent.initial}</div>
+              <div>
+                <div className="agent-name">{prop.agent.name}</div>
+                <div className="agent-role">{prop.agent.role}</div>
+                <div className="agent-phone">+34 963 000 {String(prop.id*111).padStart(3,'0')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════════════════
+function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) {
+  const featured = useMemo(() => PropertyService.list({}).filter(p => p.featured||p.nuevo).slice(0,3), []);
+  return (
+    <div className="page" style={{paddingTop:68}}>
+      <div className="hero">
+        <div className="hero-bg"/><div className="hero-grid"/>
+        <div className="hero-accent"/><div className="hero-accent2"/>
+        <div className="hero-content">
+          <div className="hero-tag">{t.hero.tag}</div>
+          <h1 className="hero-title">{t.hero.title}<br/><em>{t.hero.titleEm}</em></h1>
+          <p className="hero-subtitle">{t.hero.subtitle}</p>
+          <div className="hero-actions">
+            <button className="btn-hero btn-hero-primary" onClick={() => setPage('catalogue')}>{t.hero.cta1}</button>
+            <button className="btn-hero btn-hero-outline" onClick={() => addToast({icon:'📞',msg:t.toast.callBack,gold:true})}>{t.hero.cta2}</button>
+          </div>
+          <div className="hero-stats">
+            <div><div className="hero-stat-num">{t.hero.stat1}</div><div className="hero-stat-label">{t.hero.stat1l}</div></div>
+            <div><div className="hero-stat-num">{t.hero.stat2}</div><div className="hero-stat-label">{t.hero.stat2l}</div></div>
+            <div><div className="hero-stat-num">{t.hero.stat3}</div><div className="hero-stat-label">{t.hero.stat3l}</div></div>
+          </div>
+        </div>
+      </div>
+      <div style={{padding:'5rem 2.5rem',maxWidth:1400,margin:'0 auto'}}>
+        <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'2.5rem'}}>
+          <div>
+            <div style={{fontSize:11,letterSpacing:'0.2em',color:'var(--warm-gray)',textTransform:'uppercase',marginBottom:8}}>Selección exclusiva</div>
+            <div style={{fontFamily:'var(--font-serif)',fontSize:36,fontWeight:300}}>Propiedades <em style={{fontStyle:'italic',color:'var(--warm-gray)'}}>destacadas</em></div>
+          </div>
+          <button className="btn-outline" onClick={() => setPage('catalogue')}>Ver todas →</button>
+        </div>
+        <div className="properties-grid">
+          {featured.map((p,i) => <PropertyCard key={p.id} prop={p} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPage} addToast={addToast} index={i} t={t} user={user}/>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FAVS PAGE
+// ═══════════════════════════════════════════════════════════════════
+function FavsPage({ favs, toggleFav, setDetailId, setPage, addToast, t, user }) {
+  const favProps = useMemo(() => PropertyService.list({}).filter(p => favs.includes(p.id)), [favs]);
+  return (
+    <div className="favs-page page">
+      <div className="favs-title">{t.favs.title}</div>
+      {favProps.length===0 ? (
+        <div className="favs-empty">
+          <div className="favs-empty-icon">💛</div>
+          <div className="favs-empty-text">{t.favs.empty}</div>
+          <div className="favs-empty-sub">{t.favs.emptySub}</div>
+          <button className="btn-outline" onClick={() => setPage('catalogue')}>{t.favs.explore}</button>
+        </div>
+      ) : (
+        <div className="properties-grid">
+          {favProps.map((p,i) => <PropertyCard key={p.id} prop={p} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPage} addToast={addToast} index={i} t={t} user={user}/>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH PAGE
+// ═══════════════════════════════════════════════════════════════════
+function AuthPage({ login, register, setPage, addToast, t, lang }) {
+  const [tab, setTab] = useState('login');
+  const [form, setForm] = useState({name:'',email:'',password:''});
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 600)); // simular latencia de red
+    if (tab === 'login') {
+      const res = login(form.email, form.password);
+      if (res.error) { setError(res.error); setLoading(false); return; }
+      addToast({icon:'👋',msg:t.toast.loginOk,gold:true});
+      setPage('home');
+    } else {
+      if (!form.name.trim()) { setError('El nombre es obligatorio'); setLoading(false); return; }
+      const res = register(form.name, form.email, form.password, lang);
+      if (res.error) { setError(res.error); setLoading(false); return; }
+      addToast({icon:'🎉',msg:t.toast.registerOk,gold:true});
+      setPage('home');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="page auth-page">
+      <div className="auth-card">
+        <div className="auth-title">{t.auth.title}</div>
+        <div className="auth-sub">{t.auth.sub}</div>
+        <div className="auth-tabs">
+          <button className={`auth-tab ${tab==='login'?'active':''}`} onClick={() => { setTab('login'); setError(''); }}>{t.auth.login}</button>
+          <button className={`auth-tab ${tab==='register'?'active':''}`} onClick={() => { setTab('register'); setError(''); }}>{t.auth.register}</button>
+        </div>
+        {error && <div className="modal-error">⚠ {error}</div>}
+        <form onSubmit={handleSubmit}>
+          {tab==='register' && (
+            <div className="modal-form-group"><label className="modal-label">{t.auth.name}</label><input className="modal-input" required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Elena García"/></div>
+          )}
+          <div className="modal-form-group"><label className="modal-label">{t.auth.email}</label><input className="modal-input" type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="tu@email.com"/></div>
+          <div className="modal-form-group"><label className="modal-label">{t.auth.password}</label><input className="modal-input" type="password" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="••••••••"/></div>
+          <button type="submit" className="modal-submit" disabled={loading} style={{opacity:loading?0.7:1}}>
+            {loading ? '⏳ Cargando...' : tab==='login' ? t.auth.loginBtn : t.auth.registerBtn}
+          </button>
+        </form>
+        <div className="auth-divider"><span>o</span></div>
+        <button className="btn-google" onClick={() => { addToast({icon:'🔗',msg:'OAuth Google — requiere backend real'}); }}>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          {t.auth.withGoogle}
+        </button>
+        <div style={{marginTop:'1.5rem',textAlign:'center',fontSize:13,color:'var(--warm-gray)'}}>
+          {tab==='login' ? (
+            <>{t.auth.noAccount} <button style={{background:'none',border:'none',cursor:'pointer',color:'var(--dark)',fontWeight:500,textDecoration:'underline',fontFamily:'var(--font-sans)',fontSize:13}} onClick={() => setTab('register')}>{t.auth.register}</button></>
+          ) : (
+            <>{t.auth.alreadyHave} <button style={{background:'none',border:'none',cursor:'pointer',color:'var(--dark)',fontWeight:500,textDecoration:'underline',fontFamily:'var(--font-sans)',fontSize:13}} onClick={() => setTab('login')}>{t.auth.login}</button></>
+          )}
+        </div>
+        <div style={{marginTop:'1.5rem',padding:'1rem',background:'rgba(201,168,76,0.08)',border:'1px solid rgba(201,168,76,0.2)',fontSize:12,color:'var(--warm-gray)'}}>
+          <strong style={{color:'var(--dark)'}}>Demo:</strong> admin@nova.com / admin123 · elena@nova.com / agent123 · james@gmail.com / user123
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROFILE PAGE
+// ═══════════════════════════════════════════════════════════════════
+function ProfilePage({ user, setPage, addToast }) {
+  const contacts = useMemo(() => ContactService.list().filter(c => c.email === user.email), [user]);
+  const [form, setForm] = useState({ name: user.name, email: user.email });
+  const handleSave = () => {
+    const users = DB.get('users');
+    DB.set('users', users.map(u => u.id === user.id ? { ...u, ...form } : u));
+    addToast({ icon:'✅', msg:'Perfil actualizado', gold:true });
+  };
+  return (
+    <div className="profile-page page">
+      <div className="profile-header">
+        <div className="profile-avatar-lg">{user.name.substring(0,2).toUpperCase()}</div>
+        <div>
+          <div className="profile-name">{user.name}</div>
+          <div className="profile-email">{user.email}</div>
+          <div className="profile-role">{user.role}</div>
+        </div>
+      </div>
+      <div className="profile-grid">
+        <div>
+          <div className="profile-section-title">Datos personales</div>
+          <div className="admin-form">
+            <div className="admin-form-group"><label className="admin-form-label">Nombre</label><input className="admin-form-input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></div>
+            <div className="admin-form-group"><label className="admin-form-label">Email</label><input className="admin-form-input" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></div>
+            <div className="admin-form-group"><label className="admin-form-label">Nueva contraseña</label><input className="admin-form-input" type="password" placeholder="Dejar vacío para no cambiar"/></div>
+            <button className="admin-btn" onClick={handleSave}>Guardar cambios</button>
+          </div>
+        </div>
+        <div>
+          <div className="profile-section-title">Mis solicitudes ({contacts.length})</div>
+          {contacts.length === 0 ? <div style={{color:'var(--warm-gray)',fontSize:14}}>No has enviado ninguna solicitud aún.</div> : (
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {contacts.map(c => (
+                <div key={c.id} style={{background:'var(--card-bg)',border:'1px solid var(--border)',padding:'0.85rem 1rem',fontSize:13}}>
+                  <div style={{fontWeight:500,marginBottom:4}}>{c.message.substring(0,60)}...</div>
+                  <div style={{fontSize:11,color:'var(--warm-gray)'}}>{new Date(c.createdAt).toLocaleDateString()} · <span className={`status-badge status-${c.status.toLowerCase()}`}>{c.status}</span></div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NOTIFICATIONS PAGE
+// ═══════════════════════════════════════════════════════════════════
+function NotificationsPage({ user, onNotifRead }) {
+  const [notifs, setNotifs] = useState(() => NotifService.list(user.id));
+  const markAll = () => { NotifService.markAllRead(user.id); setNotifs(NotifService.list(user.id)); onNotifRead(); };
+  const mark = id => { NotifService.markRead(id); setNotifs(NotifService.list(user.id)); onNotifRead(); };
+  const icons = { new_contact:'📩', system:'🔔', welcome:'🎉', property:'🏠' };
+  return (
+    <div className="profile-page page">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'2rem'}}>
+        <div style={{fontFamily:'var(--font-serif)',fontSize:36,fontWeight:300}}>Notificaciones</div>
+        {notifs.some(n=>!n.read) && <button className="admin-btn admin-btn-outline" onClick={markAll}>Marcar todas como leídas</button>}
+      </div>
+      {notifs.length===0 ? <div style={{textAlign:'center',padding:'4rem',color:'var(--warm-gray)',fontSize:14}}>No tienes notificaciones</div> : (
+        <div className="notif-list">
+          {notifs.map(n => (
+            <div key={n.id} className={`notif-item ${!n.read?'unread':''}`} onClick={() => mark(n.id)} style={{cursor:'pointer'}}>
+              <div className="notif-icon">{icons[n.type]||'🔔'}</div>
+              <div className="notif-body">
+                <div className="notif-title">{n.title}</div>
+                <div className="notif-msg">{n.message}</div>
+                <div className="notif-time">{new Date(n.createdAt).toLocaleString()}</div>
+              </div>
+              {!n.read && <div style={{width:8,height:8,borderRadius:'50%',background:'var(--gold)',flexShrink:0,marginTop:6}}/>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════════════════════════════
+function AdminPanel({ user, setPage, addToast }) {
+  const [section, setSection] = useState('dashboard');
+  const [properties, setProperties] = useState(() => PropertyService.list({}));
+  const [contacts, setContacts] = useState(() => ContactService.list());
+  const [users, setUsers] = useState(() => DB.get('users').map(({password:_,...u})=>u));
+  const [editProp, setEditProp] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [propForm, setPropForm] = useState({ title:'', tipo:'venta', price:'', m2:'', hab:'', banos:'', location:'', district:'Valencia', desc:'', emojiBg:'🏠', bgColor:'#2C2318', planta:'', parking:false, badge:'venta', has360:false, imgs:['🏠'], rooms360:[], amenities:[], status:'ACTIVE', featured:false, nuevo:false, priceNote:'Precio de venta', priceLabel:'', agent:{name:'Elena Morales',role:'Agente',initial:'EM'} });
+  const [uploadedImgs, setUploadedImgs] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [searchContacts, setSearchContacts] = useState('');
+
+  const refresh = () => {
+    setProperties(PropertyService.list({}));
+    setContacts(ContactService.list());
+    setUsers(DB.get('users').map(({password:_,...u})=>u));
+  };
+
+  const stats = useMemo(() => {
+    const props = PropertyService.list({});
+    const contacts = ContactService.list();
+    return {
+      totalProps: props.length,
+      activeProps: props.filter(p=>p.status==='ACTIVE').length,
+      totalViews: props.reduce((a,p) => a+(p.views||0), 0),
+      pendingContacts: contacts.filter(c=>c.status==='PENDING').length,
+      totalContacts: contacts.length,
+      totalUsers: DB.get('users').length,
+      avgPrice: Math.round(props.filter(p=>p.tipo==='venta').reduce((a,p)=>a+p.price,0)/Math.max(props.filter(p=>p.tipo==='venta').length,1)),
+    };
+  }, [section]);
+
+  const handleDeleteProp = id => {
+    if(!confirm('¿Eliminar esta propiedad?')) return;
+    PropertyService.delete(id);
+    refresh();
+    addToast({icon:'🗑️',msg:'Propiedad eliminada'});
+  };
+
+  const handleEditProp = prop => {
+    setPropForm({...prop, price:String(prop.price), m2:String(prop.m2), hab:String(prop.hab), banos:String(prop.banos), imgs: prop.imgs||['🏠'], amenities: prop.amenities||[], rooms360: prop.rooms360||[]});
+    setUploadedImgs([]);
+    setEditProp(prop);
+    setShowForm(true);
+  };
+
+  const handleNewProp = () => {
+    setPropForm({ title:'', tipo:'venta', price:'', m2:'', hab:'', banos:'', location:'', district:'Valencia', desc:'', emojiBg:'🏠', bgColor:'#2C2318', planta:'', parking:false, badge:'venta', has360:false, imgs:['🏠'], rooms360:[], amenities:[], status:'ACTIVE', featured:false, nuevo:false, priceNote:'Precio de venta', priceLabel:'', agent:{name:'Elena Morales',role:'Agente',initial:'EM'} });
+    setUploadedImgs([]);
+    setEditProp(null);
+    setShowForm(true);
+  };
+
+  const handleSaveProp = () => {
+    const data = { ...propForm, price: Number(propForm.price), m2: Number(propForm.m2), hab: Number(propForm.hab), banos: Number(propForm.banos), priceLabel: `${Number(propForm.price).toLocaleString('es-ES')} €${propForm.tipo==='alquiler'?'/mes':''}` };
+    if (!data.title || !data.price || !data.location) { addToast({icon:'⚠️',msg:'Rellena los campos obligatorios'}); return; }
+    if (editProp) { PropertyService.update(editProp.id, data); addToast({icon:'✅',msg:'Propiedad actualizada',gold:true}); }
+    else { PropertyService.create(data); addToast({icon:'✅',msg:'Propiedad creada',gold:true}); }
+    setShowForm(false); refresh();
+  };
+
+  const handleFileUpload = async files => {
+    setUploading(true);
+    const results = await Promise.all(Array.from(files).map(f => UploadService.upload(f)));
+    setUploadedImgs(prev => [...prev, ...results]);
+    addToast({icon:'📸',msg:`${results.length} imagen(es) subida(s)`,gold:true});
+    setUploading(false);
+  };
+
+  const filteredContacts = useMemo(() => contacts.filter(c =>
+    c.name.toLowerCase().includes(searchContacts.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchContacts.toLowerCase())
+  ), [contacts, searchContacts]);
+
+  const navItems = [
+    { id:'dashboard', icon:'📊', label:'Dashboard' },
+    { id:'properties', icon:'🏠', label:'Viviendas' },
+    { id:'contacts', icon:'📩', label:'Contactos/Reservas' },
+    { id:'users', icon:'👥', label:'Usuarios' },
+    { id:'notifications', icon:'🔔', label:'Notificaciones' },
+  ];
+
+  return (
+    <div className="page" style={{paddingTop:68}}>
+      {showForm && (
+        <div className="modal-overlay" onClick={e => e.target===e.currentTarget && setShowForm(false)}>
+          <div className="modal" style={{maxWidth:700}}>
+            <button className="modal-close" onClick={() => setShowForm(false)}>✕</button>
+            <div className="modal-title">{editProp ? 'Editar propiedad' : 'Nueva propiedad'}</div>
+            <div className="modal-sub" style={{marginBottom:'1.5rem'}}>Completa los datos del inmueble</div>
+            <div className="admin-form">
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Título *</label><input className="admin-form-input" value={propForm.title} onChange={e=>setPropForm({...propForm,title:e.target.value})} placeholder="Ático de lujo..."/></div>
+                <div className="admin-form-group"><label className="admin-form-label">Tipo *</label><select className="admin-form-input" value={propForm.tipo} onChange={e=>setPropForm({...propForm,tipo:e.target.value,badge:e.target.value,priceNote:e.target.value==='venta'?'Precio de venta':'Mensual'})}><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select></div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Precio (€) *</label><input className="admin-form-input" type="number" value={propForm.price} onChange={e=>setPropForm({...propForm,price:e.target.value})} placeholder="350000"/></div>
+                <div className="admin-form-group"><label className="admin-form-label">M² *</label><input className="admin-form-input" type="number" value={propForm.m2} onChange={e=>setPropForm({...propForm,m2:e.target.value})} placeholder="120"/></div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Habitaciones</label><input className="admin-form-input" type="number" value={propForm.hab} onChange={e=>setPropForm({...propForm,hab:e.target.value})} placeholder="3"/></div>
+                <div className="admin-form-group"><label className="admin-form-label">Baños</label><input className="admin-form-input" type="number" value={propForm.banos} onChange={e=>setPropForm({...propForm,banos:e.target.value})} placeholder="2"/></div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Ubicación *</label><input className="admin-form-input" value={propForm.location} onChange={e=>setPropForm({...propForm,location:e.target.value})} placeholder="Gran Vía, Valencia"/></div>
+                <div className="admin-form-group"><label className="admin-form-label">Zona</label><select className="admin-form-input" value={propForm.district} onChange={e=>setPropForm({...propForm,district:e.target.value})}><option value="Valencia">Valencia</option><option value="Periferia">Periferia</option></select></div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Planta</label><input className="admin-form-input" value={propForm.planta} onChange={e=>setPropForm({...propForm,planta:e.target.value})} placeholder="3ª"/></div>
+                <div className="admin-form-group"><label className="admin-form-label">Estado</label><select className="admin-form-input" value={propForm.status} onChange={e=>setPropForm({...propForm,status:e.target.value})}><option value="ACTIVE">Activo</option><option value="SOLD">Vendido</option><option value="INACTIVE">Inactivo</option></select></div>
+              </div>
+              <div className="admin-form-group"><label className="admin-form-label">Descripción</label><textarea className="admin-form-input" value={propForm.desc} onChange={e=>setPropForm({...propForm,desc:e.target.value})} placeholder="Descripción detallada..."/></div>
+              <div className="admin-form-row">
+                <div className="admin-form-group"><label className="admin-form-label">Emoji / icono</label><input className="admin-form-input" value={propForm.emojiBg} onChange={e=>setPropForm({...propForm,emojiBg:e.target.value})} placeholder="🏠"/></div>
+                <div className="admin-form-group"><label className="admin-form-label">Color de fondo</label><input className="admin-form-input" type="color" value={propForm.bgColor} onChange={e=>setPropForm({...propForm,bgColor:e.target.value})}/></div>
+              </div>
+              <div style={{display:'flex',gap:'1.5rem'}}>
+                <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.parking} onChange={e=>setPropForm({...propForm,parking:e.target.checked})}/> Garaje</label>
+                <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.featured} onChange={e=>setPropForm({...propForm,featured:e.target.checked})}/> Destacado</label>
+                <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.nuevo} onChange={e=>setPropForm({...propForm,nuevo:e.target.checked})}/> Nuevo</label>
+                <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.has360} onChange={e=>setPropForm({...propForm,has360:e.target.checked})}/> Tour 360°</label>
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">📸 Subir imágenes (S3 simulado)</label>
+                <div className="upload-zone" onClick={() => document.getElementById('fileInput').click()} onDragOver={e=>{e.preventDefault();e.currentTarget.classList.add('drag-over');}} onDragLeave={e=>e.currentTarget.classList.remove('drag-over')} onDrop={e=>{e.preventDefault();e.currentTarget.classList.remove('drag-over');handleFileUpload(e.dataTransfer.files);}}>
+                  <input id="fileInput" type="file" accept="image/*" multiple onChange={e=>handleFileUpload(e.target.files)}/>
+                  {uploading ? <div>⏳ Subiendo a S3...</div> : <div style={{color:'var(--warm-gray)',fontSize:13}}>Arrastra imágenes aquí o haz clic para seleccionar<br/><small>Simula subida a S3/Cloudflare R2</small></div>}
+                </div>
+                {uploadedImgs.length > 0 && (
+                  <div className="upload-preview">
+                    {uploadedImgs.map((img,i) => (
+                      <div key={i} className="upload-thumb">
+                        <img src={img.url} alt={img.name} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                        <button className="upload-thumb-del" onClick={() => setUploadedImgs(prev=>prev.filter((_,j)=>j!==i))}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={{display:'flex',gap:'1rem',marginTop:'0.5rem'}}>
+                <button className="admin-btn" style={{flex:1}} onClick={handleSaveProp}>{editProp?'Guardar cambios':'Crear propiedad'}</button>
+                <button className="admin-btn admin-btn-outline" onClick={() => setShowForm(false)}>Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="admin-layout">
+        <div className="admin-sidebar">
+          <div style={{padding:'0 1.5rem 1rem',borderBottom:'1px solid rgba(245,240,232,0.1)',marginBottom:'0.5rem'}}>
+            <div style={{fontFamily:'var(--font-serif)',fontSize:18,fontWeight:300,color:'var(--cream)',letterSpacing:'0.1em'}}>NOVA Admin</div>
+            <div style={{fontSize:11,color:'rgba(245,240,232,0.4)',marginTop:4}}>{user.email}</div>
+          </div>
+          <div className="admin-sidebar-title">Panel</div>
+          {navItems.map(item => (
+            <button key={item.id} className={`admin-nav-item ${section===item.id?'active':''}`} onClick={() => setSection(item.id)}>
+              <span style={{fontSize:16}}>{item.icon}</span>{item.label}
+            </button>
+          ))}
+          <div style={{flex:1}}/>
+          <button className="admin-nav-item" onClick={() => setPage('home')}>← Volver a la web</button>
+        </div>
+
+        <div className="admin-content">
+          {section === 'dashboard' && (
+            <div>
+              <div className="admin-header"><div className="admin-title">Dashboard</div><div style={{fontSize:12,color:'var(--warm-gray)'}}>{new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div></div>
+              <div className="admin-stats-grid">
+                <div className="admin-stat-card"><div className="admin-stat-num">{stats.activeProps}</div><div className="admin-stat-label">Propiedades activas</div><div className="admin-stat-trend admin-stat-up">↑ de {stats.totalProps} totales</div></div>
+                <div className="admin-stat-card"><div className="admin-stat-num">{stats.totalViews.toLocaleString()}</div><div className="admin-stat-label">Visitas totales</div><div className="admin-stat-trend admin-stat-up">↑ 12% este mes</div></div>
+                <div className="admin-stat-card"><div className="admin-stat-num" style={{color:'var(--danger)'}}>{stats.pendingContacts}</div><div className="admin-stat-label">Solicitudes pendientes</div><div className="admin-stat-trend">{stats.totalContacts} totales</div></div>
+                <div className="admin-stat-card"><div className="admin-stat-num">{stats.totalUsers}</div><div className="admin-stat-label">Usuarios registrados</div><div className="admin-stat-trend admin-stat-up">↑ 3 este mes</div></div>
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem'}}>
+                <div className="admin-table-wrap">
+                  <div className="admin-table-header"><div className="admin-table-title">Últimas solicitudes</div><button className="admin-btn admin-btn-sm" onClick={()=>setSection('contacts')}>Ver todas</button></div>
+                  <table><thead><tr><th>Cliente</th><th>Tipo</th><th>Estado</th></tr></thead><tbody>
+                    {ContactService.list().slice(0,4).map(c => (
+                      <tr key={c.id}><td>{c.name}</td><td style={{textTransform:'capitalize'}}>{c.tipo}</td><td><span className={`status-badge status-${c.status.toLowerCase()}`}>{c.status}</span></td></tr>
+                    ))}
+                  </tbody></table>
+                </div>
+                <div className="admin-table-wrap">
+                  <div className="admin-table-header"><div className="admin-table-title">Propiedades más vistas</div><button className="admin-btn admin-btn-sm" onClick={()=>setSection('properties')}>Ver todas</button></div>
+                  <table><thead><tr><th>Propiedad</th><th>Vistas</th><th>Estado</th></tr></thead><tbody>
+                    {[...PropertyService.list({})].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,4).map(p => (
+                      <tr key={p.id}><td style={{maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</td><td style={{color:'var(--gold)',fontWeight:500}}>{p.views||0}</td><td><span className={`status-badge status-${p.status?.toLowerCase()||'active'}`}>{p.status||'ACTIVE'}</span></td></tr>
+                    ))}
+                  </tbody></table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {section === 'properties' && (
+            <div>
+              <div className="admin-header">
+                <div className="admin-title">Viviendas</div>
+                <button className="admin-btn" onClick={handleNewProp}>+ Nueva propiedad</button>
+              </div>
+              <div className="admin-table-wrap">
+                <table>
+                  <thead><tr><th>Ref.</th><th>Título</th><th>Tipo</th><th>Precio</th><th>M²</th><th>Estado</th><th>Vistas</th><th>Acciones</th></tr></thead>
+                  <tbody>
+                    {properties.map(p => (
+                      <tr key={p.id}>
+                        <td style={{fontSize:11,color:'var(--warm-gray)'}}>NV-{String(p.id).padStart(4,'0')}</td>
+                        <td style={{maxWidth:200,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontWeight:500}}>{p.title}</td>
+                        <td><span style={{textTransform:'capitalize',fontSize:11}}>{p.tipo}</span></td>
+                        <td style={{color:'var(--dark)',fontWeight:500}}>{p.priceLabel}</td>
+                        <td>{p.m2} m²</td>
+                        <td><span className={`status-badge status-${(p.status||'active').toLowerCase()}`}>{p.status||'ACTIVE'}</span></td>
+                        <td style={{color:'var(--gold)'}}>{p.views||0}</td>
+                        <td>
+                          <div style={{display:'flex',gap:4}}>
+                            <button className="admin-btn admin-btn-sm admin-btn-outline" onClick={() => handleEditProp(p)}>✏️</button>
+                            <button className="admin-btn admin-btn-sm admin-btn-danger" onClick={() => handleDeleteProp(p.id)}>🗑️</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {section === 'contacts' && (
+            <div>
+              <div className="admin-header">
+                <div className="admin-title">Contactos & Reservas</div>
+                <input className="admin-form-input" style={{width:240}} placeholder="Buscar por nombre o email..." value={searchContacts} onChange={e=>setSearchContacts(e.target.value)}/>
+              </div>
+              <div className="admin-table-wrap">
+                <table>
+                  <thead><tr><th>Cliente</th><th>Email</th><th>Propiedad</th><th>Tipo</th><th>Idioma</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr></thead>
+                  <tbody>
+                    {filteredContacts.map(c => (
+                      <tr key={c.id}>
+                        <td style={{fontWeight:500}}>{c.name}</td>
+                        <td style={{fontSize:12,color:'var(--warm-gray)'}}>{c.email}</td>
+                        <td style={{fontSize:12}}>{c.propertyId ? `NV-${String(c.propertyId).padStart(4,'0')}` : '—'}</td>
+                        <td style={{textTransform:'capitalize',fontSize:11}}>{c.tipo}</td>
+                        <td style={{fontSize:12,textTransform:'uppercase'}}>{c.language||'es'}</td>
+                        <td>
+                          <select className="filter-select" value={c.status} onChange={e=>{ContactService.updateStatus(c.id,e.target.value);refresh();}} style={{fontSize:11}}>
+                            <option value="PENDING">PENDING</option>
+                            <option value="CONTACTED">CONTACTED</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+                        </td>
+                        <td style={{fontSize:11,color:'var(--warm-gray)'}}>{new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td><button className="admin-btn admin-btn-sm admin-btn-outline" title={c.message} onClick={()=>alert(`Mensaje:\n\n${c.message}`)}>👁</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {section === 'users' && (
+            <div>
+              <div className="admin-header"><div className="admin-title">Usuarios</div></div>
+              <div className="admin-table-wrap">
+                <table>
+                  <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Idioma</th><th>Creado</th><th>Acción</th></tr></thead>
+                  <tbody>
+                    {users.map(u => (
+                      <tr key={u.id}>
+                        <td style={{fontWeight:500,display:'flex',alignItems:'center',gap:8}}>
+                          <div style={{width:28,height:28,borderRadius:'50%',background:'var(--dark)',color:'var(--cream)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,flexShrink:0,fontWeight:500}}>{u.name.substring(0,2).toUpperCase()}</div>
+                          {u.name}
+                        </td>
+                        <td style={{fontSize:12,color:'var(--warm-gray)'}}>{u.email}</td>
+                        <td><span className={`status-badge ${u.role==='ADMIN'?'status-active':u.role==='AGENT'?'status-pending':'status-inactive'}`}>{u.role}</span></td>
+                        <td style={{fontSize:12,textTransform:'uppercase'}}>{u.lang||'es'}</td>
+                        <td style={{fontSize:11,color:'var(--warm-gray)'}}>{new Date(u.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <select className="filter-select" defaultValue={u.role} onChange={e=>{const us=DB.get('users');DB.set('users',us.map(x=>x.id===u.id?{...x,role:e.target.value}:x));refresh();addToast({icon:'✅',msg:'Rol actualizado'});}} style={{fontSize:11}}>
+                            <option value="USER">USER</option>
+                            <option value="AGENT">AGENT</option>
+                            <option value="ADMIN">ADMIN</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {section === 'notifications' && (
+            <div>
+              <div className="admin-header">
+                <div className="admin-title">Centro de Notificaciones</div>
+                <button className="admin-btn" onClick={() => { NotifService.markAllRead(user.id); addToast({icon:'✅',msg:'Todas marcadas como leídas'}); }}>Marcar todas leídas</button>
+              </div>
+              <div className="notif-list">
+                {NotifService.list(user.id).map(n => (
+                  <div key={n.id} className={`notif-item ${!n.read?'unread':''}`}>
+                    <div className="notif-icon">{n.type==='new_contact'?'📩':n.type==='welcome'?'🎉':'🔔'}</div>
+                    <div className="notif-body">
+                      <div className="notif-title">{n.title}</div>
+                      <div className="notif-msg">{n.message}</div>
+                      <div className="notif-time">{new Date(n.createdAt).toLocaleString()}</div>
+                    </div>
+                    {!n.read && <div style={{width:8,height:8,borderRadius:'50%',background:'var(--gold)',flexShrink:0,marginTop:6}}/>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// APP ROOT
+// ═══════════════════════════════════════════════════════════════════
+function App() {
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState('home');
+  const [detailId, setDetailId] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [lang, setLang] = useState(() => localStorage.getItem('nova_lang') || 'es');
+  const { user, login, register, logout, isAdmin } = useAuth();
+  const t = useT(lang);
+  const [notifCount, setNotifCount] = useState(() => user ? NotifService.unreadCount(user.id) : 0);
+
+  const favs = useMemo(() => {
+    if (!user) return JSON.parse(localStorage.getItem('nova_guest_favs') || '[]');
+    return FavService.get(user.id);
+  }, [user, page]);
+
+  useEffect(() => { setTimeout(() => setLoading(false), 2000); }, []);
+  useEffect(() => { window.scrollTo({top:0,behavior:'smooth'}); }, [page]);
+  useEffect(() => { localStorage.setItem('nova_lang', lang); }, [lang]);
+  useEffect(() => { if (user) setNotifCount(NotifService.unreadCount(user.id)); }, [user, page]);
+
+  const addToast = useCallback(t => {
+    const id = Date.now();
+    setToasts(ts => [...ts, {...t, id}]);
+    setTimeout(() => setToasts(ts => ts.filter(x => x.id !== id)), 3000);
+  }, []);
+
+  const toggleFav = useCallback(propId => {
+    if (user) {
+      FavService.toggle(user.id, propId);
+    } else {
+      const gf = JSON.parse(localStorage.getItem('nova_guest_favs')||'[]');
+      const updated = gf.includes(propId) ? gf.filter(f=>f!==propId) : [...gf, propId];
+      localStorage.setItem('nova_guest_favs', JSON.stringify(updated));
+    }
+  }, [user]);
+
+  const setPageSafe = useCallback(p => {
+    if ((p==='admin') && !isAdmin) { addToast({icon:'🔒',msg:'Acceso restringido a administradores'}); return; }
+    setPage(p);
+  }, [isAdmin]);
+
+  return (
+    <>
+      {loading && (
+        <div className="loader-overlay">
+          <div className="loader-logo">NOVA</div>
+          <div className="loader-line"/>
+          <div className="loader-sub">Portal Inmobiliario</div>
+        </div>
+      )}
+      <Navbar page={page} setPage={setPageSafe} favCount={favs.length} user={user} logout={logout} lang={lang} setLang={setLang} notifCount={notifCount} addToast={addToast} t={t}/>
+      {page==='home' && <HomePage setPage={setPageSafe} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} addToast={addToast} t={t} user={user}/>}
+      {page==='catalogue' && <CataloguePage favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
+      {page==='detail' && detailId && <DetailPage id={detailId} favs={favs} toggleFav={toggleFav} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
+      {page==='favs' && <FavsPage favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
+      {page==='auth' && <AuthPage login={login} register={register} setPage={setPageSafe} addToast={addToast} t={t} lang={lang}/>}
+      {page==='admin' && user && isAdmin && <AdminPanel user={user} setPage={setPageSafe} addToast={addToast}/>}
+      {page==='profile' && user && <ProfilePage user={user} setPage={setPageSafe} addToast={addToast}/>}
+      {page==='notifications' && user && <NotificationsPage user={user} onNotifRead={() => setNotifCount(NotifService.unreadCount(user.id))}/>}
+      <ToastContainer toasts={toasts}/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
