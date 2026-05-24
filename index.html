@@ -4,12 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>NOVA — Portal Inmobiliario</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Nunito:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
-:root{--cream:#F5F0E8;--dark:#1A1714;--gold:#C9A84C;--gold-light:#E8D5A3;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Poppins', sans-serif;--font-sans:'Nunito',sans-serif;--shadow:0 4px 32px rgba(26,23,20,0.08);--shadow-lg:0 12px 60px rgba(26,23,20,0.14);--transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
+:root{--cream:#F5F0E8;--dark:#1A1714;--gold:#C9A84C;--gold-light:#E8D5A3;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Cormorant Garamond',Georgia,serif;--font-sans:'DM Sans',sans-serif;--shadow:0 4px 32px rgba(26,23,20,0.08);--shadow-lg:0 12px 60px rgba(26,23,20,0.14);--transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
@@ -346,7 +346,7 @@ const DB = {
   get: (k, def = []) => { try { return JSON.parse(localStorage.getItem('nova_'+k)) ?? def; } catch { return def; } },
   set: (k, v) => { localStorage.setItem('nova_'+k, JSON.stringify(v)); },
   init() {
-    // Inicializar usuarios solo la primera vez
+    // Usuarios: solo se crean si no existen
     if (!this.get('users_init', false)) {
       this.set('users', [
         { id: 'u1', name: 'Admin Nova', email: 'admin@nova.com', password: 'admin123', role: 'ADMIN', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
@@ -355,11 +355,11 @@ const DB = {
       ]);
       this.set('users_init', true);
     }
-    // Inicializar propiedades solo si no hay ninguna guardada
+    // Propiedades: solo se inicializan si NO hay ninguna guardada — preserva las creadas desde el admin
     if (!localStorage.getItem('nova_properties')) {
       this.set('properties', INITIAL_PROPERTIES);
     }
-    // Inicializar el resto solo la primera vez
+    // Resto: solo la primera vez
     if (!this.get('initialized', false)) {
       this.set('contacts', [
         { id: 'c1', name: 'Sarah Thompson', email: 'sarah@gmail.com', phone: '+44 7700 900123', propertyId: '1', message: 'Interested in the penthouse. Can I arrange a viewing?', tipo: 'visita', status: 'PENDING', createdAt: new Date(Date.now()-86400000).toISOString(), language: 'en' },
@@ -371,8 +371,7 @@ const DB = {
         { id: 'n2', userId: 'u1', type: 'new_contact', title: 'Consulta de cliente', message: 'Klaus Müller pregunta por el chalet con piscina', read: false, createdAt: new Date(Date.now()-172800000).toISOString() },
         { id: 'n3', userId: 'u1', type: 'system', title: 'Bienvenido a NOVA', message: 'Tu plataforma inmobiliaria está lista', read: true, createdAt: new Date(Date.now()-604800000).toISOString() },
       ]);
-      this.set('subscriptions', []);
-      this.set('favorites', {});
+      if (!localStorage.getItem('nova_favorites')) this.set('favorites', {});
       this.set('initialized', true);
     }
   },
@@ -811,11 +810,11 @@ function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, i
   return (
     <div className="property-card" style={{animationDelay:`${index*0.07}s`}} onClick={() => { setDetailId(prop.id); setPage('detail'); }}>
       <div className="card-img-wrap">
-        {prop.imgs && prop.imgs[0] && prop.imgs[0].startsWith('data:') ? (
-  <img src={prop.imgs[0]} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt={prop.title}/>
-) : (
-  <div className="card-img-placeholder" style={{background:prop.bgColor}}><span>{prop.emojiBg}</span></div>
-)}
+        {prop.imgs && prop.imgs[0] && (prop.imgs[0].startsWith('data:') || prop.imgs[0].startsWith('http')) ? (
+          <img src={prop.imgs[0]} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt={prop.title}/>
+        ) : (
+          <div className="card-img-placeholder" style={{background:prop.bgColor}}><span>{prop.emojiBg}</span></div>
+        )}
         <span className={`card-badge badge-${prop.badge==='nuevo'?'nuevo':prop.badge}`}>{prop.badge==='venta'?t.catalogue.sale:prop.badge==='alquiler'?t.catalogue.rent:'Nuevo'}</span>
         <button className={`card-fav ${isFav?'active':''}`} onClick={e => { e.stopPropagation(); toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>{isFav?'❤️':'🤍'}</button>
         {prop.has360 && <div className="card-360">360°</div>}
@@ -943,25 +942,28 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
           <div>
             <div className="gallery-main">
               <div className="gallery-main-img" style={{background:prop.bgColor}}>
-  {prop.imgs[imgIndex] && prop.imgs[imgIndex].startsWith('data:') ? (
-    <img src={prop.imgs[imgIndex]} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={prop.title}/>
-  ) : (
-    <span style={{fontSize:100}}>{prop.imgs[imgIndex]}</span>
-  )}
-</div>
+                {prop.imgs[imgIndex] && (prop.imgs[imgIndex].startsWith('data:') || prop.imgs[imgIndex].startsWith('http')) ? (
+                  <img src={prop.imgs[imgIndex]} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={prop.title}/>
+                ) : (
+                  <span style={{fontSize:100}}>{prop.imgs[imgIndex]}</span>
+                )}
+              </div>
               <button className="gallery-nav gallery-prev" onClick={prevImg}>‹</button>
               <button className="gallery-nav gallery-next" onClick={nextImg}>›</button>
               <div className="gallery-counter">{imgIndex+1} / {prop.imgs.length}</div>
               {prop.has360 && <button className="gallery-360-btn" onClick={() => setShow360(true)}>⟳ Tour 360°</button>}
             </div>
             <div className="gallery-thumbs">
-              {prop.imgs.map((img,i) => <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}>
-  {img && img.startsWith('data:') ? (
-    <img src={img} style={{width:'100%',height:'100%',objectFit:'cover'}} alt=""/>
-  ) : (
-    <span>{img}</span>
-  )}
-</div>
+              {prop.imgs.map((img,i) => (
+                <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}>
+                  {img && (img.startsWith('data:') || img.startsWith('http')) ? (
+                    <img src={img} style={{width:'100%',height:'100%',objectFit:'cover'}} alt=""/>
+                  ) : (
+                    <span>{img}</span>
+                  )}
+                </div>
+              ))}
+            </div>
             <div style={{marginTop:'2rem'}}>
               <div className="detail-title">{prop.title}</div>
               <div className="detail-location">📍 {prop.location}</div>
