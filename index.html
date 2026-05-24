@@ -317,11 +317,11 @@ textarea.admin-form-input{resize:vertical;min-height:90px;}
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // BACKEND SIMULADO — JWT + DB + Auth + Storage + Notifications
 // ═══════════════════════════════════════════════════════════════════
-
+ 
 // ─── Utilidades JWT ─────────────────────────────────────────────────
 const JWT = {
   sign(payload, secret = 'nova_jwt_secret_2025') {
@@ -340,7 +340,7 @@ const JWT = {
     } catch { return null; }
   },
 };
-
+ 
 // ─── Base de datos simulada (localStorage) ─────────────────────────
 const DB = {
   get: (k, def = []) => { try { return JSON.parse(localStorage.getItem('nova_'+k)) ?? def; } catch { return def; } },
@@ -376,7 +376,7 @@ const DB = {
     }
   },
 };
-
+ 
 // ─── Auth Service ───────────────────────────────────────────────────
 const AuthService = {
   login(email, password) {
@@ -408,7 +408,7 @@ const AuthService = {
     return safeUser;
   },
 };
-
+ 
 // ─── Property Service ────────────────────────────────────────────────
 const PropertyService = {
   list(filters = {}) {
@@ -443,7 +443,7 @@ const PropertyService = {
     return { success: true };
   },
 };
-
+ 
 // ─── Contact Service ─────────────────────────────────────────────────
 const ContactService = {
   submit(data) {
@@ -461,7 +461,7 @@ const ContactService = {
     DB.set('contacts', contacts.map(c => c.id === id ? { ...c, status } : c));
   },
 };
-
+ 
 // ─── Favorites Service ────────────────────────────────────────────────
 const FavService = {
   get(userId) { return DB.get('favorites')[userId] || []; },
@@ -473,7 +473,7 @@ const FavService = {
     return favs[userId];
   },
 };
-
+ 
 // ─── Notification Service ─────────────────────────────────────────────
 const NotifService = {
   list(userId) { return DB.get('notifications').filter(n => n.userId === userId).sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt)); },
@@ -487,7 +487,7 @@ const NotifService = {
   },
   unreadCount(userId) { return DB.get('notifications').filter(n => n.userId === userId && !n.read).length; },
 };
-
+ 
 // ─── Upload Service (simulado) ────────────────────────────────────────
 const UploadService = {
   async upload(file) {
@@ -501,7 +501,7 @@ const UploadService = {
     });
   },
 };
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // I18N — 4 IDIOMAS
 // ═══════════════════════════════════════════════════════════════════
@@ -551,9 +551,9 @@ const TRANSLATIONS = {
     toast: { saved:'Opgeslagen in favorieten', removed:'Verwijderd uit favorieten', visitOk:'Bezichtiging bevestigd!', callBack:'We bellen u snel terug', loginOk:'Welkom terug!', registerOk:'Account succesvol aangemaakt', logoutOk:'Uitgelogd' },
   },
 };
-
+ 
 const useT = (lang) => TRANSLATIONS[lang] || TRANSLATIONS.es;
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // DATOS INICIALES
 // ═══════════════════════════════════════════════════════════════════
@@ -565,10 +565,10 @@ const INITIAL_PROPERTIES = [
   { id:'5', title:'Apartamento con terraza Cabanyal', tipo:'alquiler', price:950, priceLabel:'950 €/mes', priceNote:'Mensual', m2:78, hab:2, banos:1, parking:false, planta:'4ª', location:'Cabanyal, Valencia', district:'Valencia', badge:'alquiler', desc:'Luminoso apartamento reformado con terraza privada de 25 m² y vistas parciales al mar. A 5 minutos caminando de la playa.', emojiBg:'🌅', bgColor:'#1A3A4C', imgs:['🌅','🛏️','🌿','🍽️','🌊'], imgLabels:['Terraza','Dormitorio','Terraza tarde','Salón','Playa cercana'], amenities:['Terraza 25m²','Vistas al mar','5 min playa','Ascensor','Reformado 2023','Aire acondicionado','Calefacción','Fibra óptica'], has360:false, agent:{ name:'Laura Sanz', role:'Asesora Alquiler', initial:'LS' }, featured:false, nuevo:false, status:'ACTIVE', views:67, rooms360:[], createdAt:'2025-03-10T10:00:00Z' },
   { id:'6', title:'Penthouse minimalista Campanar', tipo:'venta', price:560000, priceLabel:'560.000 €', priceNote:'Precio de venta', m2:175, hab:3, banos:2, parking:true, planta:'Ático 7ª', location:'Campanar, Valencia', district:'Valencia', badge:'nuevo', desc:'Penthouse de nueva construcción con acabados minimalistas de primer nivel. Grandes terrazas con vistas 360° a la ciudad y al Parque de Cabecera. Sistema domótico KNX, ventilación VMC y certificación energética A.', emojiBg:'🏙️', bgColor:'#2C2C3E', imgs:['🏙️','🛋️','🛏️','🧖','🌃'], imgLabels:['Terraza principal','Salón','Suite','Baño spa','Vista nocturna'], amenities:['Certificación A','Domótica KNX','VMC','Piscina comunitaria','Garaje','Trastero','Suelos porcelánico','Cocina Bulthaup','Baño spa','Terrazas 60m²','Vistas 360°','Obra nueva'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:true, status:'ACTIVE', views:201, rooms360:['Salón','Terraza','Dormitorio','Baño'], createdAt:'2025-03-15T12:00:00Z' },
 ];
-
+ 
 // ─── Init DB ──────────────────────────────────────────────────────
 DB.init();
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // HOOKS
 // ═══════════════════════════════════════════════════════════════════
@@ -578,7 +578,7 @@ function useAuth() {
     const t = localStorage.getItem('nova_token');
     return t ? AuthService.me(t) : null;
   });
-
+ 
   const login = useCallback((email, password) => {
     const res = AuthService.login(email, password);
     if (res.error) return res;
@@ -587,7 +587,7 @@ function useAuth() {
     setUser(res.user);
     return res;
   }, []);
-
+ 
   const register = useCallback((name, email, password, lang) => {
     const res = AuthService.register(name, email, password, lang);
     if (res.error) return res;
@@ -596,16 +596,16 @@ function useAuth() {
     setUser(res.user);
     return res;
   }, []);
-
+ 
   const logout = useCallback(() => {
     localStorage.removeItem('nova_token');
     setToken(null);
     setUser(null);
   }, []);
-
+ 
   return { user, token, login, register, logout, isAdmin: user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' };
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════════════════
@@ -621,7 +621,7 @@ function ToastContainer({ toasts }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // LANG SELECTOR
 // ═══════════════════════════════════════════════════════════════════
@@ -638,20 +638,20 @@ function LangSelector({ lang, setLang }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // NAVBAR
 // ═══════════════════════════════════════════════════════════════════
 function Navbar({ page, setPage, favCount, user, logout, lang, setLang, notifCount, addToast, t }) {
   const [scrolled, setScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+ 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
+ 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-logo" onClick={() => setPage('home')}>
@@ -696,7 +696,7 @@ function Navbar({ page, setPage, favCount, user, logout, lang, setLang, notifCou
     </nav>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // TOUR 360°
 // ═══════════════════════════════════════════════════════════════════
@@ -757,7 +757,7 @@ function Tour360({ property, onClose }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // VISIT MODAL
 // ═══════════════════════════════════════════════════════════════════
@@ -801,7 +801,7 @@ function VisitModal({ property, onClose, addToast, t, user }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // PROPERTY CARD
 // ═══════════════════════════════════════════════════════════════════
@@ -838,7 +838,7 @@ function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, i
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // CATALOGUE
 // ═══════════════════════════════════════════════════════════════════
@@ -912,7 +912,7 @@ function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, use
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // DETAIL PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -922,16 +922,16 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
   const [show360, setShow360] = useState(false);
   const [showVisit, setShowVisit] = useState(false);
   const isFav = favs.includes(prop?.id);
-
+ 
   useEffect(() => {
     const p = PropertyService.getById(id);
     if (p) { PropertyService.update(id, { views: (p.views||0)+1 }); setProp({...p, views:(p.views||0)+1}); }
   }, [id]);
-
+ 
   if (!prop) return null;
   const prevImg = () => setImgIndex(i => (i-1+prop.imgs.length)%prop.imgs.length);
   const nextImg = () => setImgIndex(i => (i+1)%prop.imgs.length);
-
+ 
   return (
     <div className="page">
       {show360 && <Tour360 property={prop} onClose={() => setShow360(false)}/>}
@@ -1027,7 +1027,7 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // HOME PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -1068,7 +1068,7 @@ function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) 
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // FAVS PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -1092,7 +1092,7 @@ function FavsPage({ favs, toggleFav, setDetailId, setPage, addToast, t, user }) 
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // AUTH PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -1101,7 +1101,7 @@ function AuthPage({ login, register, setPage, addToast, t, lang }) {
   const [form, setForm] = useState({name:'',email:'',password:''});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+ 
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
@@ -1121,7 +1121,7 @@ function AuthPage({ login, register, setPage, addToast, t, lang }) {
     }
     setLoading(false);
   };
-
+ 
   return (
     <div className="page auth-page">
       <div className="auth-card">
@@ -1161,7 +1161,7 @@ function AuthPage({ login, register, setPage, addToast, t, lang }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // PROFILE PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -1210,7 +1210,7 @@ function ProfilePage({ user, setPage, addToast }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // NOTIFICATIONS PAGE
 // ═══════════════════════════════════════════════════════════════════
@@ -1243,7 +1243,7 @@ function NotificationsPage({ user, onNotifRead }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // ADMIN PANEL
 // ═══════════════════════════════════════════════════════════════════
@@ -1258,13 +1258,13 @@ function AdminPanel({ user, setPage, addToast }) {
   const [uploadedImgs, setUploadedImgs] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [searchContacts, setSearchContacts] = useState('');
-
+ 
   const refresh = () => {
     setProperties(PropertyService.list({}));
     setContacts(ContactService.list());
     setUsers(DB.get('users').map(({password:_,...u})=>u));
   };
-
+ 
   const stats = useMemo(() => {
     const props = PropertyService.list({});
     const contacts = ContactService.list();
@@ -1278,28 +1278,28 @@ function AdminPanel({ user, setPage, addToast }) {
       avgPrice: Math.round(props.filter(p=>p.tipo==='venta').reduce((a,p)=>a+p.price,0)/Math.max(props.filter(p=>p.tipo==='venta').length,1)),
     };
   }, [section]);
-
+ 
   const handleDeleteProp = id => {
     if(!confirm('¿Eliminar esta propiedad?')) return;
     PropertyService.delete(id);
     refresh();
     addToast({icon:'🗑️',msg:'Propiedad eliminada'});
   };
-
+ 
   const handleEditProp = prop => {
     setPropForm({...prop, price:String(prop.price), m2:String(prop.m2), hab:String(prop.hab), banos:String(prop.banos), imgs: prop.imgs||['🏠'], amenities: prop.amenities||[], rooms360: prop.rooms360||[]});
     setUploadedImgs([]);
     setEditProp(prop);
     setShowForm(true);
   };
-
+ 
   const handleNewProp = () => {
     setPropForm({ title:'', tipo:'venta', price:'', m2:'', hab:'', banos:'', location:'', district:'Valencia', desc:'', emojiBg:'🏠', bgColor:'#2C2318', planta:'', parking:false, badge:'venta', has360:false, imgs:['🏠'], rooms360:[], amenities:[], status:'ACTIVE', featured:false, nuevo:false, priceNote:'Precio de venta', priceLabel:'', agent:{name:'Elena Morales',role:'Agente',initial:'EM'} });
     setUploadedImgs([]);
     setEditProp(null);
     setShowForm(true);
   };
-
+ 
   const handleSaveProp = () => {
     const imgs = uploadedImgs.length > 0 ? uploadedImgs.map(i => i.url) : propForm.imgs;
     const data = {
@@ -1317,7 +1317,7 @@ function AdminPanel({ user, setPage, addToast }) {
     else { PropertyService.create(data); addToast({icon:'✅',msg:'Propiedad creada',gold:true}); }
     setShowForm(false); refresh();
   };
-
+ 
   const handleFileUpload = async files => {
     setUploading(true);
     const results = await Promise.all(Array.from(files).map(f => UploadService.upload(f)));
@@ -1325,12 +1325,12 @@ function AdminPanel({ user, setPage, addToast }) {
     addToast({icon:'📸',msg:`${results.length} imagen(es) subida(s)`,gold:true});
     setUploading(false);
   };
-
+ 
   const filteredContacts = useMemo(() => contacts.filter(c =>
     c.name.toLowerCase().includes(searchContacts.toLowerCase()) ||
     c.email.toLowerCase().includes(searchContacts.toLowerCase())
   ), [contacts, searchContacts]);
-
+ 
   const navItems = [
     { id:'dashboard', icon:'📊', label:'Dashboard' },
     { id:'properties', icon:'🏠', label:'Viviendas' },
@@ -1338,7 +1338,7 @@ function AdminPanel({ user, setPage, addToast }) {
     { id:'users', icon:'👥', label:'Usuarios' },
     { id:'notifications', icon:'🔔', label:'Notificaciones' },
   ];
-
+ 
   return (
     <div className="page" style={{paddingTop:68}}>
       {showForm && (
@@ -1404,7 +1404,7 @@ function AdminPanel({ user, setPage, addToast }) {
           </div>
         </div>
       )}
-
+ 
       <div className="admin-layout">
         <div className="admin-sidebar">
           <div style={{padding:'0 1.5rem 1rem',borderBottom:'1px solid rgba(245,240,232,0.1)',marginBottom:'0.5rem'}}>
@@ -1420,7 +1420,7 @@ function AdminPanel({ user, setPage, addToast }) {
           <div style={{flex:1}}/>
           <button className="admin-nav-item" onClick={() => setPage('home')}>← Volver a la web</button>
         </div>
-
+ 
         <div className="admin-content">
           {section === 'dashboard' && (
             <div>
@@ -1451,7 +1451,7 @@ function AdminPanel({ user, setPage, addToast }) {
               </div>
             </div>
           )}
-
+ 
           {section === 'properties' && (
             <div>
               <div className="admin-header">
@@ -1484,7 +1484,7 @@ function AdminPanel({ user, setPage, addToast }) {
               </div>
             </div>
           )}
-
+ 
           {section === 'contacts' && (
             <div>
               <div className="admin-header">
@@ -1518,7 +1518,7 @@ function AdminPanel({ user, setPage, addToast }) {
               </div>
             </div>
           )}
-
+ 
           {section === 'users' && (
             <div>
               <div className="admin-header"><div className="admin-title">Usuarios</div></div>
@@ -1550,7 +1550,7 @@ function AdminPanel({ user, setPage, addToast }) {
               </div>
             </div>
           )}
-
+ 
           {section === 'notifications' && (
             <div>
               <div className="admin-header">
@@ -1577,7 +1577,7 @@ function AdminPanel({ user, setPage, addToast }) {
     </div>
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════
 // APP ROOT
 // ═══════════════════════════════════════════════════════════════════
@@ -1590,23 +1590,23 @@ function App() {
   const { user, login, register, logout, isAdmin } = useAuth();
   const t = useT(lang);
   const [notifCount, setNotifCount] = useState(() => user ? NotifService.unreadCount(user.id) : 0);
-
+ 
   const favs = useMemo(() => {
     if (!user) return JSON.parse(localStorage.getItem('nova_guest_favs') || '[]');
     return FavService.get(user.id);
   }, [user, page]);
-
+ 
   useEffect(() => { setTimeout(() => setLoading(false), 2000); }, []);
   useEffect(() => { window.scrollTo({top:0,behavior:'smooth'}); }, [page]);
   useEffect(() => { localStorage.setItem('nova_lang', lang); }, [lang]);
   useEffect(() => { if (user) setNotifCount(NotifService.unreadCount(user.id)); }, [user, page]);
-
+ 
   const addToast = useCallback(t => {
     const id = Date.now();
     setToasts(ts => [...ts, {...t, id}]);
     setTimeout(() => setToasts(ts => ts.filter(x => x.id !== id)), 3000);
   }, []);
-
+ 
   const toggleFav = useCallback(propId => {
     if (user) {
       FavService.toggle(user.id, propId);
@@ -1616,12 +1616,12 @@ function App() {
       localStorage.setItem('nova_guest_favs', JSON.stringify(updated));
     }
   }, [user]);
-
+ 
   const setPageSafe = useCallback(p => {
     if ((p==='admin') && !isAdmin) { addToast({icon:'🔒',msg:'Acceso restringido a administradores'}); return; }
     setPage(p);
   }, [isAdmin]);
-
+ 
   return (
     <>
       {loading && (
@@ -1644,7 +1644,7 @@ function App() {
     </>
   );
 }
-
+ 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
