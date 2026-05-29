@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RURAL VISTA — Portal Inmobiliario</title>
+<title>NOVA — Portal Inmobiliario</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 :root{--cream:#F5F0E8;--dark:#1A1714;--gold:#C9A84C;--gold-light:#E8D5A3;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Fraunces',Georgia,serif;--font-sans:'Inter',sans-serif;--shadow:0 4px 32px rgba(26,23,20,0.08);--shadow-lg:0 12px 60px rgba(26,23,20,0.14);--transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
@@ -15,69 +16,13 @@ html{scroll-behavior:smooth;}
 body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
 #root{min-height:100vh;}
 /* LOADER */
-div class="loader-overlay">
-    <div class="loader-logo">RURAL VISTA</div>
-    <div class="loader-line"></div>
-    <div class="loader-sub">Portal inmobiliario</div>
-</div>
-
-<style>
-.loader-overlay{
-    position:fixed;
-    inset:0;
-    background:var(--dark);
-    z-index:9999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    animation:loaderFade 0.6s ease 1.8s forwards;
-}
-
-.loader-logo{
-    font-family:var(--font-serif);
-    font-size:42px;
-    font-weight:300;
-    color:var(--cream);
-    letter-spacing:0.12em;
-    opacity:0;
-    animation:logoReveal 0.8s ease 0.3s forwards;
-}
-
-.loader-line{
-    width:0;
-    height:1px;
-    background:var(--gold);
-    margin-top:16px;
-    animation:lineGrow 1s ease 0.8s forwards;
-}
-
-.loader-sub{
-    font-size:11px;
-    letter-spacing:0.3em;
-    color:var(--warm-gray);
-    margin-top:12px;
-    text-transform:uppercase;
-    opacity:0;
-    animation:logoReveal 0.8s ease 1.2s forwards;
-}
-
-@keyframes logoReveal{
-    to{
-        opacity:1;
-    }
-}
-
-@keyframes lineGrow{
-    to{
-        width:160px;
-    }
-}
-
-@keyframes loaderFade{
-    to{
-        opacity:0;
-        pointer-events:none;
+.loader-overlay{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:loaderFade 0.6s ease 1.8s forwards;}
+.loader-logo{font-family:var(--font-serif);font-size:48px;font-weight:300;color:var(--cream);letter-spacing:0.15em;opacity:0;animation:logoReveal 0.8s ease 0.3s forwards;}
+.loader-line{width:0;height:1px;background:var(--gold);margin-top:16px;animation:lineGrow 1s ease 0.8s forwards;}
+.loader-sub{font-size:11px;letter-spacing:0.3em;color:var(--warm-gray);margin-top:12px;text-transform:uppercase;opacity:0;animation:logoReveal 0.8s ease 1.2s forwards;}
+@keyframes logoReveal{to{opacity:1;}}
+@keyframes lineGrow{to{width:120px;}}
+@keyframes loaderFade{to{opacity:0;pointer-events:none;}}
 /* NAVBAR */
 .navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2.5rem;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:var(--transition);}
 .navbar.scrolled{height:56px;background:rgba(245,240,232,0.98);}
@@ -218,23 +163,7 @@ div class="loader-overlay">
 .map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);font-size:32px;animation:mapBounce 1s ease 0.5s both;}
 @keyframes mapBounce{from{transform:translate(-50%,-80%) scale(0);opacity:0;}to{transform:translate(-50%,-100%) scale(1);opacity:1;}}
 .map-label{position:absolute;top:50%;left:50%;transform:translate(-50%,10px);background:var(--dark);color:var(--cream);font-size:11px;letter-spacing:0.1em;padding:4px 12px;white-space:nowrap;}
-/* TOUR 360 */
-.tour-overlay{position:fixed;inset:0;z-index:200;background:var(--dark);display:flex;flex-direction:column;}
-.tour-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid rgba(245,240,232,0.1);flex-shrink:0;}
-.tour-title{font-family:var(--font-serif);font-size:20px;color:var(--cream);font-weight:300;}
-.tour-close{background:none;border:none;color:var(--cream);font-size:24px;cursor:pointer;padding:4px 8px;}
-.tour-viewport{flex:1;position:relative;overflow:hidden;cursor:grab;}
-.tour-viewport:active{cursor:grabbing;}
-.tour-panorama{position:absolute;top:0;height:100%;display:flex;align-items:center;transition:none;}
-.tour-element{position:absolute;display:flex;flex-direction:column;align-items:center;gap:8px;}
-.tour-element-dot{width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;animation:tourPulse 2s infinite;}
-.tour-element-dot::after{content:'';width:8px;height:8px;background:var(--gold);border-radius:50%;}
-@keyframes tourPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.4);}50%{box-shadow:0 0 0 12px rgba(201,168,76,0);}}
-.tour-element-label{font-size:11px;letter-spacing:0.1em;color:var(--gold-light);background:rgba(26,23,20,0.8);padding:4px 10px;white-space:nowrap;}
-.tour-rooms{display:flex;gap:8px;padding:1rem 2rem;border-top:1px solid rgba(245,240,232,0.1);flex-shrink:0;overflow-x:auto;}
-.tour-room-btn{background:none;border:1px solid rgba(245,240,232,0.15);color:var(--cream);padding:6px 16px;font-size:11px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);text-transform:uppercase;transition:var(--transition);white-space:nowrap;}
-.tour-room-btn:hover,.tour-room-btn.active{background:var(--gold);border-color:var(--gold);color:var(--dark);}
-.tour-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(26,23,20,0.7);color:rgba(245,240,232,0.6);font-size:11px;letter-spacing:0.1em;padding:6px 16px;pointer-events:none;}
+
 /* FAVOURITES */
 .favs-page{max-width:1400px;margin:0 auto;padding:3rem 2.5rem;}
 .favs-title{font-family:var(--font-serif);font-size:40px;font-weight:300;margin-bottom:2rem;}
@@ -564,7 +493,7 @@ const UploadService = {
 const TRANSLATIONS = {
   es: {
     nav: { home:'Inicio', properties:'Propiedades', favorites:'Favoritos', services:'Servicios', contact:'Contacto', login:'Acceder', admin:'Admin', profile:'Mi perfil', logout:'Cerrar sesión' },
-    hero: { tag:'Portal Inmobiliario en España', title:'Tu próximo hogar,', titleEm:'extraordinario', subtitle:'Selección exclusiva de propiedades únicas en las mejores ubicaciones. Experiencia premium, resultados reales.', cta1:'Ver propiedades', cta2:'Hablar con un asesor', stat1:'+1.200', stat1l:'Propiedades', stat2:'98%', stat2l:'Satisfacción', stat3:'15', stat3l:'Años experiencia' },
+    hero: { tag:'Portal Inmobiliario de Lujo · Valencia', title:'Tu próximo hogar,', titleEm:'extraordinario', subtitle:'Selección exclusiva de propiedades únicas en las mejores ubicaciones. Experiencia premium, resultados reales.', cta1:'Ver propiedades', cta2:'Hablar con un asesor', stat1:'+1.200', stat1l:'Propiedades', stat2:'98%', stat2l:'Satisfacción', stat3:'15', stat3l:'Años experiencia' },
     catalogue: { title:'Propiedades', subtitle:'disponibles', search:'Buscar', searchPh:'Ciudad, barrio, descripción...', type:'Tipo', all:'Todos', sale:'Venta', rent:'Alquiler', zone:'Zona', allZones:'Todas', maxPrice:'Precio máx.', noLimit:'Sin límite', minM2:'M² mínimo', apply:'Buscar', clear:'Limpiar', noResults:'Sin resultados', noResultsSub:'Prueba a modificar los filtros', showAll:'Ver todas las propiedades' },
     card: { detail:'Ver detalle', info:'Solicitar info', beds:'hab.', baths:'baños' },
     detail: { back:'Volver al catálogo', meters:'Metros', bedrooms:'Dormitorios', bathrooms:'Baños', floor:'Planta', description:'Descripción', features:'Características', location:'Ubicación', sale:'— VENTA —', rent:'— ALQUILER —', requestVisit:'Solicitar visita', saveProperty:'Guardar propiedad', savedProperty:'En favoritos', tour360:'Tour virtual 360°', included:'Incluido', notIncluded:'No incluido', garage:'Garaje', ref:'Ref.' },
@@ -575,7 +504,7 @@ const TRANSLATIONS = {
   },
   en: {
     nav: { home:'Home', properties:'Properties', favorites:'Favorites', services:'Services', contact:'Contact', login:'Sign in', admin:'Admin', profile:'My profile', logout:'Sign out' },
-    hero: { tag:' Real Estate Portal in Sapin', title:'Your next home,', titleEm:'extraordinary', subtitle:'Exclusive selection of unique properties in the best locations. Premium experience, real results.', cta1:'View properties', cta2:'Talk to an advisor', stat1:'+1,200', stat1l:'Properties', stat2:'98%', stat2l:'Satisfaction', stat3:'15', stat3l:'Years experience' },
+    hero: { tag:'Luxury Real Estate Portal · Valencia', title:'Your next home,', titleEm:'extraordinary', subtitle:'Exclusive selection of unique properties in the best locations. Premium experience, real results.', cta1:'View properties', cta2:'Talk to an advisor', stat1:'+1,200', stat1l:'Properties', stat2:'98%', stat2l:'Satisfaction', stat3:'15', stat3l:'Years experience' },
     catalogue: { title:'Properties', subtitle:'available', search:'Search', searchPh:'City, neighbourhood, description...', type:'Type', all:'All', sale:'For sale', rent:'For rent', zone:'Area', allZones:'All areas', maxPrice:'Max. price', noLimit:'No limit', minM2:'Min. sqm', apply:'Search', clear:'Clear', noResults:'No results', noResultsSub:'Try adjusting your filters', showAll:'View all properties' },
     card: { detail:'View details', info:'Request info', beds:'beds', baths:'baths' },
     detail: { back:'Back to catalogue', meters:'Sqm', bedrooms:'Bedrooms', bathrooms:'Bathrooms', floor:'Floor', description:'Description', features:'Features', location:'Location', sale:'— FOR SALE —', rent:'— FOR RENT —', requestVisit:'Request a viewing', saveProperty:'Save property', savedProperty:'Saved', tour360:'Virtual 360° tour', included:'Included', notIncluded:'Not included', garage:'Garage', ref:'Ref.' },
@@ -586,7 +515,7 @@ const TRANSLATIONS = {
   },
   de: {
     nav: { home:'Startseite', properties:'Immobilien', favorites:'Favoriten', services:'Dienstleistungen', contact:'Kontakt', login:'Anmelden', admin:'Admin', profile:'Mein Profil', logout:'Abmelden' },
-    hero: { tag:'Immobilienportal', title:'Ihr nächstes Zuhause,', titleEm:'außergewöhnlich', subtitle:'Exklusive Auswahl einzigartiger Immobilien in besten Lagen. Premium-Erfahrung, echte Ergebnisse.', cta1:'Immobilien ansehen', cta2:'Berater kontaktieren', stat1:'+1.200', stat1l:'Immobilien', stat2:'98%', stat2l:'Zufriedenheit', stat3:'15', stat3l:'Jahre Erfahrung' },
+    hero: { tag:'Luxus-Immobilienportal · Valencia', title:'Ihr nächstes Zuhause,', titleEm:'außergewöhnlich', subtitle:'Exklusive Auswahl einzigartiger Immobilien in besten Lagen. Premium-Erfahrung, echte Ergebnisse.', cta1:'Immobilien ansehen', cta2:'Berater kontaktieren', stat1:'+1.200', stat1l:'Immobilien', stat2:'98%', stat2l:'Zufriedenheit', stat3:'15', stat3l:'Jahre Erfahrung' },
     catalogue: { title:'Immobilien', subtitle:'verfügbar', search:'Suchen', searchPh:'Stadt, Viertel, Beschreibung...', type:'Typ', all:'Alle', sale:'Kauf', rent:'Miete', zone:'Zone', allZones:'Alle', maxPrice:'Max. Preis', noLimit:'Kein Limit', minM2:'Min. m²', apply:'Suchen', clear:'Zurücksetzen', noResults:'Keine Ergebnisse', noResultsSub:'Filter anpassen', showAll:'Alle Immobilien' },
     card: { detail:'Details', info:'Info anfragen', beds:'Zi.', baths:'Bäder' },
     detail: { back:'Zurück', meters:'m²', bedrooms:'Schlafzimmer', bathrooms:'Badezimmer', floor:'Etage', description:'Beschreibung', features:'Ausstattung', location:'Lage', sale:'— KAUF —', rent:'— MIETE —', requestVisit:'Besichtigung anfragen', saveProperty:'Merken', savedProperty:'Gemerkt', tour360:'Virtueller 360°-Rundgang', included:'Inklusive', notIncluded:'Nicht inklusive', garage:'Garage', ref:'Ref.' },
@@ -597,7 +526,7 @@ const TRANSLATIONS = {
   },
   nl: {
     nav: { home:'Startpagina', properties:'Woningen', favorites:'Favorieten', services:'Diensten', contact:'Contact', login:'Inloggen', admin:'Admin', profile:'Mijn profiel', logout:'Uitloggen' },
-    hero: { tag:'Vastgoedportaal', title:'Uw volgende thuis,', titleEm:'buitengewoon', subtitle:'Exclusieve selectie van unieke woningen op de beste locaties. Premium ervaring, echte resultaten.', cta1:'Woningen bekijken', cta2:'Spreek met adviseur', stat1:'+1.200', stat1l:'Woningen', stat2:'98%', stat2l:'Tevredenheid', stat3:'15', stat3l:'Jaar ervaring' },
+    hero: { tag:'Luxe Vastgoedportaal · Valencia', title:'Uw volgende thuis,', titleEm:'buitengewoon', subtitle:'Exclusieve selectie van unieke woningen op de beste locaties. Premium ervaring, echte resultaten.', cta1:'Woningen bekijken', cta2:'Spreek met adviseur', stat1:'+1.200', stat1l:'Woningen', stat2:'98%', stat2l:'Tevredenheid', stat3:'15', stat3l:'Jaar ervaring' },
     catalogue: { title:'Woningen', subtitle:'beschikbaar', search:'Zoeken', searchPh:'Stad, wijk, omschrijving...', type:'Type', all:'Alles', sale:'Koop', rent:'Huur', zone:'Zone', allZones:'Alles', maxPrice:'Max. prijs', noLimit:'Geen limiet', minM2:'Min. m²', apply:'Zoeken', clear:'Wissen', noResults:'Geen resultaten', noResultsSub:'Pas de filters aan', showAll:'Alle woningen' },
     card: { detail:'Bekijk details', info:'Info aanvragen', beds:'slaapk.', baths:'badk.' },
     detail: { back:'Terug naar catalogus', meters:'m²', bedrooms:'Slaapkamers', bathrooms:'Badkamers', floor:'Verdieping', description:'Beschrijving', features:'Kenmerken', location:'Locatie', sale:'— KOOP —', rent:'— HUUR —', requestVisit:'Bezichtiging aanvragen', saveProperty:'Opslaan', savedProperty:'Opgeslagen', tour360:'Virtuele 360° tour', included:'Inbegrepen', notIncluded:'Niet inbegrepen', garage:'Garage', ref:'Ref.' },
@@ -754,67 +683,6 @@ function Navbar({ page, setPage, favCount, user, logout, lang, setLang, notifCou
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TOUR 360°
-// ═══════════════════════════════════════════════════════════════════
-function Tour360({ property, onClose }) {
-  const [activeRoom, setActiveRoom] = useState(0);
-  const [offset, setOffset] = useState(0);
-  const dragging = useRef(false);
-  const startX = useRef(0);
-  const startOff = useRef(0);
-  const roomColors = [
-    'linear-gradient(to right,#1a0f05,#2C2318,#3D2E1E,#4A3825,#5C4A35,#4A3825,#3D2E1E,#2C2318)',
-    'linear-gradient(to right,#0f1a25,#1A2C3D,#253D52,#2C4A5C,#1A3548,#0f1a25,#1A2C3D,#253D52)',
-    'linear-gradient(to right,#1a1a0f,#2C2C18,#3D3D2E,#4A4A3A,#3D3D2E,#2C2C18,#1a1a0f,#2C2C18)',
-    'linear-gradient(to right,#0f1a0f,#1A2C1A,#253D25,#2C4A2C,#1A3A1A,#0f1a0f,#1A2C1A,#253D25)',
-  ];
-  const hotspots = [
-    [{left:'20%',top:'45%',label:'Ventana'},{left:'55%',top:'55%',label:'Sofá'},{left:'80%',top:'40%',label:'TV'}],
-    [{left:'25%',top:'50%',label:'Isla'},{left:'60%',top:'40%',label:'Horno'},{left:'75%',top:'55%',label:'Nevera'}],
-    [{left:'30%',top:'60%',label:'Cama'},{left:'65%',top:'45%',label:'Armario'}],
-    [{left:'40%',top:'50%',label:'Jacuzzi'},{left:'70%',top:'40%',label:'Ducha'}],
-  ];
-  const onMouseDown = e => { dragging.current=true; startX.current=e.clientX; startOff.current=offset; };
-  const onMouseMove = e => { if(!dragging.current)return; setOffset(startOff.current+(e.clientX-startX.current)); };
-  const onMouseUp = () => { dragging.current=false; };
-  const onTouchStart = e => { dragging.current=true; startX.current=e.touches[0].clientX; startOff.current=offset; };
-  const onTouchMove = e => { if(!dragging.current)return; setOffset(startOff.current+(e.touches[0].clientX-startX.current)); };
-  return (
-    <div className="tour-overlay">
-      <div className="tour-header">
-        <div>
-          <div className="tour-title">{property.title}</div>
-          <div style={{fontSize:12,color:'rgba(245,240,232,0.4)',letterSpacing:'0.1em',marginTop:4}}>TOUR VIRTUAL 360°</div>
-        </div>
-        <button className="tour-close" onClick={onClose}>✕</button>
-      </div>
-      <div className="tour-viewport" onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onMouseUp}>
-        <div className="tour-panorama" style={{width:3000,background:roomColors[activeRoom%roomColors.length],left:offset%3000}}>
-          <div style={{position:'absolute',inset:0,opacity:0.3,backgroundImage:"url(\"data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z' fill='%23fff' fill-opacity='.03'/%3E%3C/svg%3E\")"}}/>
-          <div style={{position:'absolute',bottom:'15%',left:'5%',right:'5%',height:'30%',background:'rgba(0,0,0,0.3)',borderRadius:2}}/>
-          <div style={{position:'absolute',top:'30%',left:'10%',width:'25%',height:'40%',border:'1px solid rgba(255,255,255,0.05)'}}/>
-          <div style={{position:'absolute',top:'25%',left:'45%',width:'20%',height:'45%',border:'1px solid rgba(255,255,255,0.04)'}}/>
-        </div>
-        <div style={{position:'absolute',inset:0,pointerEvents:'none'}}>
-          {(hotspots[activeRoom%hotspots.length]||[]).map((h,i) => (
-            <div key={i} className="tour-element" style={{left:h.left,top:h.top}}>
-              <div className="tour-element-dot"/>
-              <div className="tour-element-label">{h.label}</div>
-            </div>
-          ))}
-        </div>
-        <div className="tour-hint">← Arrastra para explorar →</div>
-      </div>
-      <div className="tour-rooms">
-        {(property.rooms360||[]).map((r,i) => (
-          <button key={i} className={`tour-room-btn ${activeRoom===i?'active':''}`} onClick={() => { setActiveRoom(i); setOffset(0); }}>{r}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // VISIT MODAL
 // ═══════════════════════════════════════════════════════════════════
 function VisitModal({ property, onClose, addToast, t, user }) {
@@ -966,12 +834,60 @@ function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, use
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// MAPA REAL (Leaflet + OpenStreetMap)
+// ═══════════════════════════════════════════════════════════════════
+function RealMap({ location }) {
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+
+  useEffect(() => {
+    if (!location || !window.L) return;
+    // Geocodificar la ubicación con Nominatim (gratuito, sin API key)
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data || data.length === 0) return;
+        const { lat, lon, display_name } = data[0];
+        // Destruir mapa anterior si existe
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+        }
+        if (!mapRef.current) return;
+        const map = window.L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: false }).setView([lat, lon], 14);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19,
+        }).addTo(map);
+        const icon = window.L.divIcon({
+          html: '<div style="background:#1A1714;color:#C9A84C;width:36px;height:36px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #C9A84C;font-size:16px;"><span style="transform:rotate(45deg)">📍</span></div>',
+          iconSize: [36, 36], iconAnchor: [18, 36], className: '',
+        });
+        window.L.marker([lat, lon], { icon }).addTo(map).bindPopup(`<strong>${location}</strong>`).openPopup();
+        mapInstanceRef.current = map;
+      })
+      .catch(() => {});
+    return () => {
+      if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; }
+    };
+  }, [location]);
+
+  return (
+    <div style={{border:'1px solid var(--border)',borderRadius:0,overflow:'hidden',marginBottom:'2rem'}}>
+      <div ref={mapRef} style={{height:280,width:'100%'}}/>
+      <div style={{padding:'0.5rem 0.75rem',background:'var(--card-bg)',fontSize:11,color:'var(--warm-gray)',borderTop:'1px solid var(--border)'}}>
+        📍 {location}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // DETAIL PAGE
 // ═══════════════════════════════════════════════════════════════════
 function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
   const [prop, setProp] = useState(() => PropertyService.getById(id));
   const [imgIndex, setImgIndex] = useState(0);
-  const [show360, setShow360] = useState(false);
   const [showVisit, setShowVisit] = useState(false);
   const isFav = favs.includes(prop?.id);
 
@@ -986,7 +902,6 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
 
   return (
     <div className="page">
-      {show360 && <Tour360 property={prop} onClose={() => setShow360(false)}/>}
       {showVisit && <VisitModal property={prop} onClose={() => setShowVisit(false)} addToast={addToast} t={t} user={user}/>}
       <div className="detail-page">
         <button className="detail-back" onClick={() => setPage('catalogue')}>← {t.detail.back}</button>
@@ -1003,7 +918,6 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
               <button className="gallery-nav gallery-prev" onClick={prevImg}>‹</button>
               <button className="gallery-nav gallery-next" onClick={nextImg}>›</button>
               <div className="gallery-counter">{imgIndex+1} / {prop.imgs.length}</div>
-              {prop.has360 && <button className="gallery-360-btn" onClick={() => setShow360(true)}>⟳ Tour 360°</button>}
             </div>
             <div className="gallery-thumbs">
               {prop.imgs.map((img,i) => (
@@ -1023,24 +937,14 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
                 <div className="detail-feature"><div className="detail-feature-icon">📐</div><div className="detail-feature-value">{prop.m2}</div><div className="detail-feature-label">{t.detail.meters}</div></div>
                 <div className="detail-feature"><div className="detail-feature-icon">🛏</div><div className="detail-feature-value">{prop.hab}</div><div className="detail-feature-label">{t.detail.bedrooms}</div></div>
                 <div className="detail-feature"><div className="detail-feature-icon">🚿</div><div className="detail-feature-value">{prop.banos}</div><div className="detail-feature-label">{t.detail.bathrooms}</div></div>
-                <div className="detail-feature"><div className="detail-feature-icon">🏢</div><div className="detail-feature-value" style={{fontSize:14}}>{prop.planta}</div><div className="detail-feature-label">{t.detail.floor}</div></div>
+                <div className="detail-feature"><div className="detail-feature-icon">🚗</div><div className="detail-feature-value" style={{fontSize:14}}>{prop.parking ? '✓' : '✗'}</div><div className="detail-feature-label">{t.detail.garage}</div></div>
               </div>
               <div className="detail-section-title">{t.detail.description}</div>
               <div className="detail-desc">{prop.desc}</div>
               <div className="detail-section-title">{t.detail.features}</div>
               <div className="amenities-grid">{prop.amenities.map((a,i) => <div key={i} className="amenity"><div className="amenity-check">✓</div>{a}</div>)}</div>
               <div className="detail-section-title">{t.detail.location}</div>
-              <div className="detail-map">
-                <div className="map-grid"/>
-                <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity:0.4}}>
-                  <line x1="0" y1="60%" x2="100%" y2="60%" stroke="#8B8480" strokeWidth="12"/>
-                  <line x1="0" y1="30%" x2="100%" y2="40%" stroke="#8B8480" strokeWidth="6"/>
-                  <line x1="30%" y1="0" x2="35%" y2="100%" stroke="#8B8480" strokeWidth="8"/>
-                  <line x1="65%" y1="0" x2="60%" y2="100%" stroke="#8B8480" strokeWidth="5"/>
-                </svg>
-                <div className="map-pin">📍</div>
-                <div className="map-label">{prop.location}</div>
-              </div>
+              <RealMap location={prop.location} />
             </div>
           </div>
           <div className="detail-sidebar">
@@ -1052,7 +956,6 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
               <button className="detail-cta detail-cta-outline" onClick={() => { toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>
                 {isFav ? `❤️ ${t.detail.savedProperty}` : `🤍 ${t.detail.saveProperty}`}
               </button>
-              {prop.has360 && <button className="detail-cta detail-cta-outline" style={{marginTop:4}} onClick={() => setShow360(true)}>⟳ {t.detail.tour360}</button>}
             </div>
             <div className="detail-info-card">
               <div className="detail-info-title">Detalles del inmueble</div>
@@ -1060,7 +963,6 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.meters}</span><span className="detail-info-value">{prop.m2} m²</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.bedrooms}</span><span className="detail-info-value">{prop.hab}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.bathrooms}</span><span className="detail-info-value">{prop.banos}</span></div>
-              <div className="detail-info-row"><span className="detail-info-label">{t.detail.floor}</span><span className="detail-info-value">{prop.planta}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.garage}</span><span className="detail-info-value">{prop.parking?t.detail.included:t.detail.notIncluded}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.ref}</span><span className="detail-info-value">NV-{String(prop.id).padStart(4,'0')}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">👁 Visitas</span><span className="detail-info-value">{prop.views||0}</span></div>
@@ -1409,7 +1311,6 @@ function AdminPanel({ user, setPage, addToast }) {
                 <div className="admin-form-group"><label className="admin-form-label">Zona</label><input className="admin-form-input" value={propForm.district} onChange={e=>setPropForm({...propForm,district:e.target.value})} placeholder="Ej: Marbella, Costa del Sol..."/></div>
               </div>
               <div className="admin-form-row">
-                <div className="admin-form-group"><label className="admin-form-label">Planta</label><input className="admin-form-input" value={propForm.planta} onChange={e=>setPropForm({...propForm,planta:e.target.value})} placeholder="3ª"/></div>
                 <div className="admin-form-group"><label className="admin-form-label">Estado</label><select className="admin-form-input" value={propForm.status} onChange={e=>setPropForm({...propForm,status:e.target.value})}><option value="ACTIVE">Activo</option><option value="SOLD">Vendido</option><option value="INACTIVE">Inactivo</option></select></div>
               </div>
               <div className="admin-form-group"><label className="admin-form-label">Descripción</label><textarea className="admin-form-input" value={propForm.desc} onChange={e=>setPropForm({...propForm,desc:e.target.value})} placeholder="Descripción detallada..."/></div>
@@ -1421,7 +1322,6 @@ function AdminPanel({ user, setPage, addToast }) {
                 <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.parking} onChange={e=>setPropForm({...propForm,parking:e.target.checked})}/> Garaje</label>
                 <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.featured} onChange={e=>setPropForm({...propForm,featured:e.target.checked})}/> Destacado</label>
                 <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.nuevo} onChange={e=>setPropForm({...propForm,nuevo:e.target.checked})}/> Nuevo</label>
-                <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.has360} onChange={e=>setPropForm({...propForm,has360:e.target.checked})}/> Tour 360°</label>
               </div>
               <div className="admin-form-group">
                 <label className="admin-form-label">📸 Subir imágenes (S3 simulado)</label>
