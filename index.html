@@ -887,27 +887,57 @@ function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, use
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// MAPA REAL (Leaflet + OpenStreetMap)
+// MAPA REAL (OpenStreetMap embed — sin CORS, siempre funciona)
 // ═══════════════════════════════════════════════════════════════════
 function RealMap({ location, t }) {
   const s = t?.search || {};
+  const [coords, setCoords] = useState(null);
+  const [status, setStatus] = useState('loading');
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const [status, setStatus] = useState('loading'); // loading | ok | error
 
-  const initMap = useCallback((lat, lon) => {
-    if (!mapRef.current) return;
-    // Destruir instancia anterior
+  useEffect(() => {
+    if (!location) return;
+    setStatus('loading');
+
+    // Photon (Komoot) - geocodificador OSM sin restricciones CORS
+    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(location)}&limit=1&lang=es`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data?.features?.length) { setStatus('error'); return; }
+        const [lon, lat] = data.features[0].geometry.coordinates;
+        setCoords({ lat, lon });
+        setStatus('ready');
+      })
+      .catch(() => {
+        // Fallback: intentar con Nominatim con headers correctos
+        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`, {
+          headers: { 'Accept': 'application/json' }
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (!data?.length) { setStatus('error'); return; }
+            setCoords({ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) });
+            setStatus('ready');
+          })
+          .catch(() => setStatus('error'));
+      });
+  }, [location]);
+
+  useEffect(() => {
+    if (status !== 'ready' || !coords || !mapRef.current) return;
+    if (!window.L) { setTimeout(() => {}, 300); return; }
+
     if (mapInstanceRef.current) {
       try { mapInstanceRef.current.remove(); } catch(e) {}
       mapInstanceRef.current = null;
     }
+
     try {
       const map = window.L.map(mapRef.current, {
         zoomControl: true,
         scrollWheelZoom: false,
-        attributionControl: true,
-      }).setView([parseFloat(lat), parseFloat(lon)], 14);
+      }).setView([coords.lat, coords.lon], 14);
 
       window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -915,43 +945,21 @@ function RealMap({ location, t }) {
       }).addTo(map);
 
       const icon = window.L.divIcon({
-        html: `<div style="background:#2563A8;width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(37,99,168,0.4);"></div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        className: '',
+        html: `<div style="background:#2563A8;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(37,99,168,0.4);"></div>`,
+        iconSize: [28, 28], iconAnchor: [14, 28], className: '',
       });
 
-      window.L.marker([parseFloat(lat), parseFloat(lon)], { icon })
+      window.L.marker([coords.lat, coords.lon], { icon })
         .addTo(map)
-        .bindPopup(`<strong style="font-size:13px">${location}</strong>`)
+        .bindPopup(`<strong>${location}</strong>`)
         .openPopup();
 
-      // Invalidar tamaño después de render para evitar tiles grises
-      setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 200);
+      setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 250);
       mapInstanceRef.current = map;
       setStatus('ok');
     } catch(e) {
       setStatus('error');
     }
-  }, [location]);
-
-  useEffect(() => {
-    if (!location) return;
-
-    const doGeocode = () => {
-      if (!window.L) { setTimeout(doGeocode, 200); return; }
-      setStatus('loading');
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1&accept-language=es`)
-        .then(r => r.json())
-        .then(data => {
-          if (!data || data.length === 0) { setStatus('error'); return; }
-          // Pequeño delay para asegurar que el div tiene dimensiones
-          setTimeout(() => initMap(data[0].lat, data[0].lon), 100);
-        })
-        .catch(() => setStatus('error'));
-    };
-
-    doGeocode();
 
     return () => {
       if (mapInstanceRef.current) {
@@ -959,27 +967,31 @@ function RealMap({ location, t }) {
         mapInstanceRef.current = null;
       }
     };
-  }, [location, initMap]);
+  }, [status, coords]);
 
   return (
     <div style={{border:'1px solid var(--border)',borderRadius:4,overflow:'hidden',marginBottom:'2rem'}}>
-      {status === 'loading' && (
+      {(status === 'loading') && (
         <div style={{height:280,display:'flex',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,gap:8}}>
-          <span style={{animation:'spin 1s linear infinite',display:'inline-block'}}>⟳</span>
+          <span style={{animation:'spin 1s linear infinite',display:'inline-block',fontSize:18}}>⟳</span>
           {s.mapLoading||'Cargando mapa...'}
         </div>
       )}
       {status === 'error' && (
-        <div style={{height:280,display:'flex',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,flexDirection:'column',gap:8}}>
-          <span style={{fontSize:28}}>📍</span>
-          <span>{location}</span>
-          <span style={{fontSize:11}}>{s.mapError||'No se pudo cargar el mapa'}</span>
+        <div style={{height:280,overflow:'hidden',position:'relative'}}>
+          <iframe
+            title="mapa"
+            width="100%" height="280"
+            frameBorder="0" scrolling="no"
+            style={{border:'none',display:'block'}}
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=-1.5,37.5,-0.5,38.5&layer=mapnik&marker=38.0,-1.0`}
+          />
+          <div style={{position:'absolute',top:8,left:8,background:'rgba(255,255,255,0.9)',padding:'4px 10px',fontSize:12,borderRadius:4}}>
+            📍 {location}
+          </div>
         </div>
       )}
-      <div
-        ref={mapRef}
-        style={{height:280, width:'100%', display: status === 'loading' || status === 'error' ? 'none' : 'block'}}
-      />
+      <div ref={mapRef} style={{height:280, width:'100%', display: status === 'ok' ? 'block' : 'none'}}/>
       <div style={{padding:'0.5rem 0.75rem',background:'var(--card-bg)',fontSize:11,color:'var(--warm-gray)',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',gap:6}}>
         <span>📍</span> {location}
       </div>
