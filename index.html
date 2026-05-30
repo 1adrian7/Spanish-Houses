@@ -4,14 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>NOVA — Portal Inmobiliario</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
-:root{--cream:#F5F0E8;--dark:#1A1714;--gold:#C9A84C;--gold-light:#E8D5A3;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Fraunces',Georgia,serif;--font-sans:'Inter',sans-serif;--shadow:0 4px 32px rgba(26,23,20,0.08);--shadow-lg:0 12px 60px rgba(26,23,20,0.14);--transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
-*{box-sizing:border-box;margin:0;padding:0;}
+:root{--cream:#F5F0E8;--dark:#2C4A6E;--gold:#F59A4F;--gold-light:#FBCB9A;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Outfit',sans-serif;--font-sans:'Plus Jakarta Sans',sans-serif;
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
 #root{min-height:100vh;}
@@ -43,7 +42,7 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 @keyframes pageIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 /* HERO */
 .hero{height:calc(100vh - 68px);position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2C2318 0%,#1A1714 50%,#3D2E1E 100%);}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2E6BA8 0%,#2C5282 50%,#3A7BC8 100%);}
 .hero-grid{position:absolute;inset:0;opacity:0.04;background-image:linear-gradient(var(--cream) 1px,transparent 1px),linear-gradient(90deg,var(--cream) 1px,transparent 1px);background-size:60px 60px;}
 .hero-accent{position:absolute;top:20%;right:15%;width:320px;height:320px;border:1px solid rgba(201,168,76,0.2);border-radius:50%;animation:pulse 4s ease-in-out infinite;}
 .hero-accent2{position:absolute;top:20%;right:15%;width:240px;height:240px;border:1px solid rgba(201,168,76,0.12);border-radius:50%;animation:pulse 4s ease-in-out 1s infinite;}
