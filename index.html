@@ -34,7 +34,7 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .nav-link:hover,.nav-link.active{color:var(--dark);}
 .nav-fav-btn{position:relative;background:none;border:none;cursor:pointer;padding:6px;}
 .nav-fav-badge{position:absolute;top:0;right:0;background:var(--gold);color:white;font-size:9px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;}
-.nav-cta{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.nav-cta{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border-radius:6px;}
 .nav-cta:hover{background:var(--gold);}
 .nav-user-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);padding:6px 12px;cursor:pointer;font-family:var(--font-sans);font-size:12px;color:var(--dark);transition:var(--transition);}
 .nav-user-btn:hover{border-color:var(--gold);}
@@ -55,7 +55,7 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .hero-title em{font-style:italic;color:var(--gold-light);}
 .hero-subtitle{font-size:15px;color:rgba(245,240,232,0.6);max-width:460px;line-height:1.7;margin-bottom:2.5rem;}
 .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;}
-.btn-hero{padding:0.9rem 2.2rem;font-size:13px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border:none;text-transform:uppercase;}
+.btn-hero{padding:0.9rem 2.2rem;font-size:13px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border:none;text-transform:uppercase;border-radius:6px;}
 .btn-hero-primary{background:var(--gold);color:var(--dark);}
 .btn-hero-primary:hover{background:var(--gold-light);transform:translateY(-1px);}
 .btn-hero-outline{background:transparent;color:var(--cream);border:1px solid rgba(245,240,232,0.3);}
@@ -77,9 +77,9 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .filter-search{flex:2;min-width:200px;}
 .filter-search input{width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:13px;padding:4px 0;outline:none;color:var(--dark);}
 .filter-search input::placeholder{color:var(--warm-gray);}
-.filter-btn-apply{background:var(--dark);color:var(--cream);border:none;padding:0.6rem 1.5rem;font-size:12px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);text-transform:uppercase;transition:var(--transition);flex-shrink:0;}
+.filter-btn-apply{background:var(--dark);color:var(--cream);border:none;padding:0.6rem 1.5rem;font-size:12px;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-sans);text-transform:uppercase;transition:var(--transition);flex-shrink:0;border-radius:6px;}
 .filter-btn-apply:hover{background:var(--gold);color:var(--dark);}
-.filter-btn-clear{background:none;border:1px solid var(--border);color:var(--warm-gray);padding:0.6rem 1rem;font-size:12px;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);flex-shrink:0;}
+.filter-btn-clear{background:none;border:1px solid var(--border);color:var(--warm-gray);padding:0.6rem 1rem;font-size:12px;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);flex-shrink:0;border-radius:6px;}
 .filter-btn-clear:hover{border-color:var(--dark);color:var(--dark);}
 /* CARDS */
 .properties-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
@@ -103,9 +103,9 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .card-location{font-size:12px;color:var(--warm-gray);margin-bottom:1rem;display:flex;align-items:center;gap:4px;}
 .card-details{display:flex;gap:1rem;font-size:12px;color:var(--warm-gray);padding-top:1rem;border-top:1px solid var(--border);}
 .card-actions{display:flex;gap:8px;margin-top:1rem;}
-.card-btn{flex:1;padding:0.6rem;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);border:1px solid var(--border);background:none;color:var(--dark);transition:var(--transition);}
+.card-btn{flex:1;padding:0.6rem;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);border:1px solid var(--border);background:none;color:var(--dark);transition:var(--transition);border-radius:6px;}
 .card-btn:hover{background:var(--dark);color:var(--cream);border-color:var(--dark);}
-.card-btn-primary{background:var(--dark);color:var(--cream);border-color:var(--dark);}
+.card-btn-primary{background:var(--dark);color:var(--cream);border-color:var(--dark);border-radius:6px;}
 .card-btn-primary:hover{background:var(--gold);border-color:var(--gold);color:var(--dark);}
 /* DETAIL */
 .detail-page{max-width:1400px;margin:0 auto;padding:2rem 2.5rem 4rem;}
@@ -131,9 +131,9 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .detail-badge{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;}
 .detail-price{font-family:var(--font-serif);font-size:42px;font-weight:300;line-height:1;margin-bottom:0.25rem;}
 .detail-price-note{font-size:12px;color:rgba(245,240,232,0.5);margin-bottom:1.5rem;}
-.detail-cta{width:100%;background:var(--gold);color:var(--dark);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);font-weight:500;margin-bottom:0.75rem;transition:var(--transition);}
+.detail-cta{width:100%;background:var(--gold);color:var(--dark);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);font-weight:500;margin-bottom:0.75rem;transition:var(--transition);border-radius:6px;}
 .detail-cta:hover{background:var(--gold-light);}
-.detail-cta-outline{background:transparent;border:1px solid rgba(245,240,232,0.25);color:var(--cream);}
+.detail-cta-outline{background:transparent;border:1px solid rgba(245,240,232,0.25);color:var(--cream);border-radius:6px;}
 .detail-cta-outline:hover{border-color:var(--cream);background:rgba(245,240,232,0.05);}
 .detail-info-card{background:var(--card-bg);border:1px solid var(--border);padding:1.5rem;}
 .detail-info-title{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:1rem;}
@@ -172,7 +172,7 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .favs-empty-icon{font-size:60px;margin-bottom:1rem;opacity:0.3;}
 .favs-empty-text{font-family:var(--font-serif);font-size:24px;font-weight:300;color:var(--warm-gray);margin-bottom:0.5rem;}
 .favs-empty-sub{font-size:14px;color:var(--warm-gray);margin-bottom:2rem;}
-.btn-outline{background:none;border:1px solid var(--dark);color:var(--dark);padding:0.75rem 2rem;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.btn-outline{background:none;border:1px solid var(--dark);color:var(--dark);padding:0.75rem 2rem;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border-radius:6px;}
 .btn-outline:hover{background:var(--dark);color:var(--cream);}
 /* TOAST */
 .toast-container{position:fixed;bottom:2rem;right:2rem;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
@@ -195,13 +195,13 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .modal-input{width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:14px;padding:8px 0;outline:none;color:var(--dark);transition:border-color 0.2s;}
 .modal-input:focus{border-color:var(--dark);}
 .modal-dates{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-.modal-submit{width:100%;background:var(--dark);color:var(--cream);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);margin-top:0.5rem;transition:var(--transition);}
+.modal-submit{width:100%;background:var(--dark);color:var(--cream);border:none;padding:1rem;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:var(--font-sans);margin-top:0.5rem;transition:var(--transition);border-radius:6px;}
 .modal-submit:hover{background:var(--gold);color:var(--dark);}
 .modal-success{text-align:center;padding:2rem 0;}
 .modal-success-icon{font-size:48px;margin-bottom:1rem;}
 .modal-success-title{font-family:var(--font-serif);font-size:26px;font-weight:300;margin-bottom:0.5rem;}
 .modal-success-sub{font-size:13px;color:var(--warm-gray);}
-.modal-error{background:rgba(155,44,44,0.08);border:1px solid rgba(155,44,44,0.2);color:#9B2C2C;padding:0.75rem 1rem;font-size:13px;margin-bottom:1rem;}
+.modal-error{background:rgba(155,44,44,0.08);border:1px solid rgba(155,44,44,0.2);color:#9B2C2C;padding:0.75rem 1rem;font-size:13px;margin-bottom:1rem;border-radius:6px;}
 /* ADMIN */
 .admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 68px);}
 .admin-sidebar{background:var(--dark);padding:2rem 0;display:flex;flex-direction:column;gap:4px;}
@@ -222,12 +222,12 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .admin-table-wrap{background:var(--card-bg);border:1px solid var(--border);overflow:hidden;}
 .admin-table-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);}
 .admin-table-title{font-size:14px;font-weight:500;}
-.admin-btn{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);}
+.admin-btn{background:var(--dark);color:var(--cream);border:none;padding:0.5rem 1.25rem;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:var(--font-sans);transition:var(--transition);border-radius:6px;}
 .admin-btn:hover{background:var(--gold);color:var(--dark);}
 .admin-btn-sm{padding:0.35rem 0.8rem;font-size:11px;}
-.admin-btn-danger{background:var(--danger);color:white;}
+.admin-btn-danger{background:var(--danger);color:white;border-radius:6px;}
 .admin-btn-danger:hover{background:#7B2222;}
-.admin-btn-outline{background:none;border:1px solid var(--border);color:var(--dark);}
+.admin-btn-outline{background:none;border:1px solid var(--border);color:var(--dark);border-radius:6px;}
 .admin-btn-outline:hover{border-color:var(--dark);background:var(--dark);color:var(--cream);}
 table{width:100%;border-collapse:collapse;}
 th{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);padding:0.75rem 1.5rem;text-align:left;border-bottom:1px solid var(--border);background:var(--card-bg);}
@@ -544,10 +544,10 @@ const useT = (lang) => TRANSLATIONS[lang] || TRANSLATIONS.es;
 // DATOS INICIALES
 // ═══════════════════════════════════════════════════════════════════
 const INITIAL_PROPERTIES = [
-  { id:'1', title:'Ático de lujo con vistas al mar', tipo:'venta', price:895000, priceLabel:'895.000 €', priceNote:'Precio de venta', m2:210, hab:4, banos:3, parking:true, planta:'Ático 8ª', location:'Paseo Marítimo, Valencia', district:'Valencia', badge:'venta', desc:'Espectacular ático en primera línea de mar con amplias terrazas de 80 m² y panorámicas vistas al Mediterráneo. Acabados de alta calidad con suelos de mármol italiano, cocina de diseño y domótica integrada. Comunidad con piscina, gimnasio y conserjería 24h.', emojiBg:'🌊', bgColor:'#1A3A5C', imgs:['🌊','🛋️','🍽️','🛁','🌇'], imgLabels:['Salón principal','Comedor','Cocina','Baño master','Terraza'], amenities:['Piscina comunitaria','Gimnasio','Conserjería 24h','Domótica','Garaje doble','Trastero','Aire acondicionado','Suelos mármol','Cocina de diseño','Ascensor','Terraza 80m²','Vistas al mar'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:false, status:'ACTIVE', views:248, rooms360:['Salón','Cocina','Dormitorio','Terraza'], createdAt:'2025-01-15T10:00:00Z' },
+  { id:'1', title:'Ático de lujo con vistas al mar', tipo:'venta', price:895000, priceLabel:'895.000 €', priceNote:'Precio de venta', m2:210, hab:4, banos:3, parking:true, planta:'Ático 8ª', location:'Paseo Marítimo, Valencia', district:'Valencia', badge:'venta', desc:'Ático en primera línea de mar con amplias terrazas de 80 m² y panorámicas vistas al Mediterráneo. Acabados de alta calidad con suelos de mármol italiano, cocina de diseño y domótica integrada. Comunidad con piscina, gimnasio y conserjería 24h.', emojiBg:'🌊', bgColor:'#1A3A5C', imgs:['🌊','🛋️','🍽️','🛁','🌇'], imgLabels:['Salón principal','Comedor','Cocina','Baño master','Terraza'], amenities:['Piscina comunitaria','Gimnasio','Conserjería 24h','Domótica','Garaje doble','Trastero','Aire acondicionado','Suelos mármol','Cocina de diseño','Ascensor','Terraza 80m²','Vistas al mar'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:false, status:'ACTIVE', views:248, rooms360:['Salón','Cocina','Dormitorio','Terraza'], createdAt:'2025-01-15T10:00:00Z' },
   { id:'2', title:'Piso modernista Ensanche', tipo:'venta', price:420000, priceLabel:'420.000 €', priceNote:'Precio de venta', m2:145, hab:3, banos:2, parking:false, planta:'3ª', location:'Gran Vía, Valencia', district:'Valencia', badge:'venta', desc:'Elegante piso en edificio modernista completamente reformado manteniendo detalles originales: molduras, parquet de madera y techos altos de 3,20 m. Distribución luminosa con grandes ventanales a Gran Vía.', emojiBg:'🏛️', bgColor:'#3D2E1E', imgs:['🏛️','🛏️','🛁','🍳','🌆'], imgLabels:['Salón','Dormitorio principal','Baño','Cocina','Vistas'], amenities:['Techos 3.20m','Parquet original','Molduras','Cocina americana','Ascensor','Patio interior','Doble acristalamiento','Gas natural','Fibra óptica'], has360:true, agent:{ name:'Carlos Vega', role:'Asesor Senior', initial:'CV' }, featured:false, nuevo:false, status:'ACTIVE', views:134, rooms360:['Salón','Dormitorio','Baño','Cocina'], createdAt:'2025-02-01T09:00:00Z' },
   { id:'3', title:'Chalet independiente con piscina', tipo:'venta', price:780000, priceLabel:'780.000 €', priceNote:'Precio de venta', m2:350, hab:5, banos:4, parking:true, planta:'Unifamiliar', location:'La Moraleja, Valencia', district:'Periferia', badge:'venta', desc:'Impresionante chalet moderno en urbanización privada con piscina de 12 metros, jardín de 600 m² y garaje para 3 vehículos. La vivienda dispone de salón-comedor de 80 m², cocina office, bodega y zona de servicio independiente.', emojiBg:'🏡', bgColor:'#2D4A2E', imgs:['🏡','🏊','🌿','🍷','🛏️'], imgLabels:['Fachada','Piscina','Jardín','Bodega','Suite principal'], amenities:['Piscina privada 12m','Jardín 600m²','Garaje 3 vehículos','Bodega','Zona servicio','Alarma','Domótica','Riego automático','BBQ exterior','Jacuzzi','Gimnasio','Trastero'], has360:true, agent:{ name:'Isabel Fuentes', role:'Agente Premium', initial:'IF' }, featured:false, nuevo:true, status:'ACTIVE', views:312, rooms360:['Salón','Piscina','Jardín','Suite'], createdAt:'2025-02-20T11:00:00Z' },
-  { id:'4', title:'Loft industrial Ruzafa', tipo:'alquiler', price:1450, priceLabel:'1.450 €/mes', priceNote:'Mensual + IVA', m2:95, hab:1, banos:1, parking:false, planta:'1ª', location:'Ruzafa, Valencia', district:'Valencia', badge:'alquiler', desc:'Espectacular loft de estilo industrial en el corazón de Ruzafa. Techos con vigas de acero visto a 5 metros de altura, suelos de microcemento y ventanales de 3 metros.', emojiBg:'🏗️', bgColor:'#4A3825', imgs:['🏗️','🛏️','🍳','🚿','🌃'], imgLabels:['Espacio principal','Mezzanine','Cocina','Baño','Vista nocturna'], amenities:['Techos 5 metros','Microcemento','Vigas acero visto','Mezzanine','Cocina equipada','Fibra óptica','Aire split','Portero automático'], has360:false, agent:{ name:'Marcos Gil', role:'Asesor Alquiler', initial:'MG' }, featured:false, nuevo:true, status:'ACTIVE', views:89, rooms360:[], createdAt:'2025-03-01T08:00:00Z' },
+  { id:'4', title:'Loft industrial Ruzafa', tipo:'alquiler', price:1450, priceLabel:'1.450 €/mes', priceNote:'Mensual + IVA', m2:95, hab:1, banos:1, parking:false, planta:'1ª', location:'Ruzafa, Valencia', district:'Valencia', badge:'alquiler', desc:'Loft de estilo industrial en el corazón de Ruzafa. Techos con vigas de acero visto a 5 metros de altura, suelos de microcemento y ventanales de 3 metros.', emojiBg:'🏗️', bgColor:'#4A3825', imgs:['🏗️','🛏️','🍳','🚿','🌃'], imgLabels:['Espacio principal','Mezzanine','Cocina','Baño','Vista nocturna'], amenities:['Techos 5 metros','Microcemento','Vigas acero visto','Mezzanine','Cocina equipada','Fibra óptica','Aire split','Portero automático'], has360:false, agent:{ name:'Marcos Gil', role:'Asesor Alquiler', initial:'MG' }, featured:false, nuevo:true, status:'ACTIVE', views:89, rooms360:[], createdAt:'2025-03-01T08:00:00Z' },
   { id:'5', title:'Apartamento con terraza Cabanyal', tipo:'alquiler', price:950, priceLabel:'950 €/mes', priceNote:'Mensual', m2:78, hab:2, banos:1, parking:false, planta:'4ª', location:'Cabanyal, Valencia', district:'Valencia', badge:'alquiler', desc:'Luminoso apartamento reformado con terraza privada de 25 m² y vistas parciales al mar. A 5 minutos caminando de la playa.', emojiBg:'🌅', bgColor:'#1A3A4C', imgs:['🌅','🛏️','🌿','🍽️','🌊'], imgLabels:['Terraza','Dormitorio','Terraza tarde','Salón','Playa cercana'], amenities:['Terraza 25m²','Vistas al mar','5 min playa','Ascensor','Reformado 2023','Aire acondicionado','Calefacción','Fibra óptica'], has360:false, agent:{ name:'Laura Sanz', role:'Asesora Alquiler', initial:'LS' }, featured:false, nuevo:false, status:'ACTIVE', views:67, rooms360:[], createdAt:'2025-03-10T10:00:00Z' },
   { id:'6', title:'Penthouse minimalista Campanar', tipo:'venta', price:560000, priceLabel:'560.000 €', priceNote:'Precio de venta', m2:175, hab:3, banos:2, parking:true, planta:'Ático 7ª', location:'Campanar, Valencia', district:'Valencia', badge:'nuevo', desc:'Penthouse de nueva construcción con acabados minimalistas de primer nivel. Grandes terrazas con vistas 360° a la ciudad y al Parque de Cabecera. Sistema domótico KNX, ventilación VMC y certificación energética A.', emojiBg:'🏙️', bgColor:'#2C2C3E', imgs:['🏙️','🛋️','🛏️','🧖','🌃'], imgLabels:['Terraza principal','Salón','Suite','Baño spa','Vista nocturna'], amenities:['Certificación A','Domótica KNX','VMC','Piscina comunitaria','Garaje','Trastero','Suelos porcelánico','Cocina Bulthaup','Baño spa','Terrazas 60m²','Vistas 360°','Obra nueva'], has360:true, agent:{ name:'Elena Morales', role:'Agente Exclusivo', initial:'EM' }, featured:true, nuevo:true, status:'ACTIVE', views:201, rooms360:['Salón','Terraza','Dormitorio','Baño'], createdAt:'2025-03-15T12:00:00Z' },
 ];
@@ -613,24 +613,32 @@ function ToastContainer({ toasts }) {
 // ═══════════════════════════════════════════════════════════════════
 function LangSelector({ lang, setLang }) {
   const [open, setOpen] = useState(false);
-  const flags = { es:'🇪🇸', en:'🇬🇧', de:'🇩🇪', nl:'🇳🇱' };
-  const labels = { es:'ES', en:'EN', de:'DE', nl:'NL' };
+  const langData = {
+    es: { label:'Español',   code:'ES', img:'https://flagcdn.com/20x15/es.png' },
+    en: { label:'English',   code:'EN', img:'https://flagcdn.com/20x15/gb.png' },
+    de: { label:'Deutsch',   code:'DE', img:'https://flagcdn.com/20x15/de.png' },
+    nl: { label:'Nederlands',code:'NL', img:'https://flagcdn.com/20x15/nl.png' },
+  };
   const ref = useRef(null);
   useEffect(() => {
     const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+  const current = langData[lang];
   return (
     <div ref={ref} style={{position:'relative'}}>
-      <button onClick={() => setOpen(o => !o)} style={{display:'flex',alignItems:'center',gap:6,background:'none',border:'1px solid var(--border)',padding:'5px 10px',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:12,color:'var(--dark)',fontWeight:600,transition:'var(--transition)'}}>
-        {flags[lang]} {labels[lang]} <span style={{fontSize:9,opacity:0.5}}>▾</span>
+      <button onClick={() => setOpen(o => !o)} style={{display:'flex',alignItems:'center',gap:7,background:'none',border:'1px solid var(--border)',padding:'5px 10px',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:12,color:'var(--dark)',fontWeight:600,transition:'var(--transition)',borderRadius:4}}>
+        <img src={current.img} alt={current.label} style={{width:20,height:15,borderRadius:2,objectFit:'cover'}}/>
+        {current.code}
+        <span style={{fontSize:9,opacity:0.4}}>▾</span>
       </button>
       {open && (
-        <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,background:'white',border:'1px solid var(--border)',boxShadow:'var(--shadow)',zIndex:300,minWidth:100,overflow:'hidden'}}>
-          {Object.entries(flags).map(([code, flag]) => (
-            <button key={code} onClick={() => { setLang(code); setOpen(false); }} style={{display:'flex',alignItems:'center',gap:8,width:'100%',padding:'8px 14px',background:lang===code?'var(--cream)':'none',border:'none',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:13,color:'var(--dark)',fontWeight:lang===code?600:400,textAlign:'left'}}>
-              {flag} {labels[code]}
+        <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,background:'white',border:'1px solid var(--border)',boxShadow:'var(--shadow)',zIndex:300,minWidth:140,overflow:'hidden',borderRadius:6}}>
+          {Object.entries(langData).map(([code, d]) => (
+            <button key={code} onClick={() => { setLang(code); setOpen(false); }} style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'9px 14px',background:lang===code?'#EFF6FF':'none',border:'none',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:13,color:'var(--dark)',fontWeight:lang===code?600:400,textAlign:'left'}}>
+              <img src={d.img} alt={d.label} style={{width:20,height:15,borderRadius:2,objectFit:'cover',flexShrink:0}}/>
+              {d.label}
             </button>
           ))}
         </div>
@@ -1017,51 +1025,53 @@ function HeroSearch({ setPage, t }) {
 
   return (
     <div style={{background:'white',borderBottom:'1px solid var(--border)',boxShadow:'0 4px 24px rgba(37,99,168,0.08)'}}>
-      <div style={{maxWidth:1400,margin:'0 auto',padding:'0 2.5rem',display:'flex',alignItems:'stretch',minHeight:80}}>
-        <div style={fieldWrap}>
-          <div style={fieldLabel}>Buscar</div>
-          <input style={fieldInput} placeholder="Ciudad, zona, descripción..." value={form.location} onChange={e=>setForm({...form,location:e.target.value})} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
-        </div>
-        <div style={{...fieldWrap, maxWidth:160}}>
-          <div style={fieldLabel}>Tipo</div>
-          <select style={{...fieldInput,cursor:'pointer',appearance:'none'}} value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
-            <option value="">Todos</option>
-            <option value="venta">En venta</option>
-            <option value="alquiler">En alquiler</option>
-          </select>
-        </div>
-        <div style={{...fieldWrap, maxWidth:180}}>
-          <div style={fieldLabel}>Dormitorios</div>
-          <select style={{...fieldInput,cursor:'pointer',appearance:'none'}} value={form.bedrooms} onChange={e=>setForm({...form,bedrooms:e.target.value})}>
-            <option value="">Cualquier número</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-          </select>
-        </div>
-        <div style={{...fieldWrap, maxWidth:180}}>
-          <div style={fieldLabel}>Precio máx.</div>
-          <select style={{...fieldInput,cursor:'pointer',appearance:'none'}} value={form.maxPrice} onChange={e=>setForm({...form,maxPrice:e.target.value})}>
-            <option value="">Sin límite</option>
-            <option value="100000">100.000 €</option>
-            <option value="200000">200.000 €</option>
-            <option value="350000">350.000 €</option>
-            <option value="500000">500.000 €</option>
-            <option value="1000000">1.000.000 €</option>
-          </select>
-        </div>
-        <div style={{...fieldWrap, maxWidth:160, borderRight:'none'}}>
-          <div style={fieldLabel}>ID de propiedad</div>
-          <input style={fieldInput} placeholder="Ej: RV-0001" value={form.propId} onChange={e=>setForm({...form,propId:e.target.value})} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
-        </div>
-        <div style={{display:'flex',alignItems:'center',padding:'0 1.5rem',gap:8,flexShrink:0}}>
-          <button onClick={handleSearch} style={{background:'var(--dark)',color:'white',border:'none',padding:'0.75rem 2rem',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',letterSpacing:'0.05em',transition:'background 0.2s',borderRadius:4}} onMouseOver={e=>e.currentTarget.style.background='#1A4F8A'} onMouseOut={e=>e.currentTarget.style.background='var(--dark)'}>
-            Buscar
-          </button>
-          <button onClick={()=>setForm({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''})} style={{background:'none',border:'none',fontSize:13,color:'var(--warm-gray)',cursor:'pointer',fontFamily:'inherit',padding:'0.75rem 0.5rem'}}>
-            Limpiar
-          </button>
+      <div style={{maxWidth:1400,margin:'0 auto',padding:'0.75rem 2.5rem'}}>
+        <div style={{background:'white',border:'1.5px solid rgba(37,99,168,0.18)',borderRadius:10,boxShadow:'0 2px 16px rgba(37,99,168,0.07)',display:'flex',alignItems:'stretch',overflow:'hidden'}}>
+          <div style={{display:'flex',flexDirection:'column',gap:5,flex:2,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6'}}>
+            <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Buscar</div>
+            <input style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',width:'100%',padding:0}} placeholder="Ciudad, zona, descripción..." value={form.location} onChange={e=>setForm({...form,location:e.target.value})} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:5,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',minWidth:130}}>
+            <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Tipo</div>
+            <select style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',padding:0,cursor:'pointer',appearance:'none'}} value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
+              <option value="">Todos</option>
+              <option value="venta">En venta</option>
+              <option value="alquiler">En alquiler</option>
+            </select>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:5,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',minWidth:150}}>
+            <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Dormitorios</div>
+            <select style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',padding:0,cursor:'pointer',appearance:'none'}} value={form.bedrooms} onChange={e=>setForm({...form,bedrooms:e.target.value})}>
+              <option value="">Cualquier número</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+            </select>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:5,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',minWidth:150}}>
+            <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Precio máx.</div>
+            <select style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',padding:0,cursor:'pointer',appearance:'none'}} value={form.maxPrice} onChange={e=>setForm({...form,maxPrice:e.target.value})}>
+              <option value="">Sin límite</option>
+              <option value="100000">100.000 €</option>
+              <option value="200000">200.000 €</option>
+              <option value="350000">350.000 €</option>
+              <option value="500000">500.000 €</option>
+              <option value="1000000">1.000.000 €</option>
+            </select>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:5,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',minWidth:130}}>
+            <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>ID propiedad</div>
+            <input style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',padding:0}} placeholder="Ej: RV-0001" value={form.propId} onChange={e=>setForm({...form,propId:e.target.value})} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:8,padding:'0 1.25rem',flexShrink:0}}>
+            <button onClick={handleSearch} style={{background:'var(--dark)',color:'white',border:'none',padding:'0.65rem 1.6rem',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',borderRadius:6,transition:'background 0.2s'}} onMouseOver={e=>e.currentTarget.style.background='#1A4F8A'} onMouseOut={e=>e.currentTarget.style.background='var(--dark)'}>
+              Buscar
+            </button>
+            <button onClick={()=>setForm({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''})} style={{background:'none',border:'none',fontSize:13,color:'var(--warm-gray)',cursor:'pointer',fontFamily:'inherit',padding:'0.65rem 0.4rem',borderRadius:6}}>
+              Limpiar
+            </button>
+          </div>
         </div>
       </div>
     </div>
