@@ -403,6 +403,7 @@ const PropertyService = {
     if (filters.district) props = props.filter(p => p.district?.toLowerCase().includes(filters.district.toLowerCase()));
     if (filters.maxPrice) props = props.filter(p => p.price <= Number(filters.maxPrice));
     if (filters.minM2) props = props.filter(p => p.m2 >= Number(filters.minM2));
+    if (filters.minBedrooms) props = props.filter(p => p.hab >= Number(filters.minBedrooms));
     if (filters.search) {
       const q = filters.search.toLowerCase();
       props = props.filter(p => p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
@@ -792,9 +793,25 @@ function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, i
 // ═══════════════════════════════════════════════════════════════════
 // CATALOGUE
 // ═══════════════════════════════════════════════════════════════════
-function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, user }) {
-  const [filters, setFilters] = useState({tipo:'',district:'',maxPrice:'',minM2:'',search:''});
-  const [applied, setApplied] = useState({tipo:'',district:'',maxPrice:'',minM2:'',search:''});
+function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, user, heroFilters, setHeroFilters }) {
+  const initFilters = {
+    tipo: heroFilters?.tipo || '',
+    district: heroFilters?.location || '',
+    maxPrice: heroFilters?.maxPrice || '',
+    minM2: '',
+    minBedrooms: heroFilters?.bedrooms || '',
+    search: heroFilters?.location || '',
+  };
+  const [filters, setFilters] = useState(initFilters);
+  const [applied, setApplied] = useState(initFilters);
+
+  // Clear heroFilters after consuming them so next visit starts fresh
+  useEffect(() => {
+    if (heroFilters?.tipo || heroFilters?.location || heroFilters?.maxPrice || heroFilters?.bedrooms) {
+      if (setHeroFilters) setHeroFilters({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''});
+    }
+  }, []);
+
   const filtered = useMemo(() => PropertyService.list(applied), [applied]);
   const apply = () => { setApplied({...filters}); };
   const clear = () => { const e={tipo:'',district:'',maxPrice:'',minM2:'',search:''}; setFilters(e); setApplied(e); };
@@ -1002,10 +1019,22 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
 
 // ═══════════════════════════════════════════════════════════════════
 // HERO SEARCH
-function HeroSearch({ setPage, t }) {
-  const [form, setForm] = useState({ tipo:'', location:'', bedrooms:'', maxPrice:'', propId:'' });
+function HeroSearch({ setPage, t, heroFilters, setHeroFilters }) {
+  const form = heroFilters;
+  const setForm = setHeroFilters;
 
-  const handleSearch = () => setPage('catalogue');
+  const handleSearch = () => {
+    // Si hay ID de propiedad busca directamente esa ficha
+    if (form.propId.trim()) {
+      const id = form.propId.replace(/^RV-0*/i, '');
+      const prop = PropertyService.getById(id);
+      if (prop) {
+        setPage('detail_from_search_' + id);
+        return;
+      }
+    }
+    setPage('catalogue');
+  };
 
   const fieldWrap = { display:'flex', flexDirection:'column', gap:6, flex:1, minWidth:0, padding:'1rem 1.5rem', borderRight:'1px solid var(--border)' };
   const fieldLabel = { fontSize:10, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--warm-gray)', fontWeight:600 };
@@ -1068,7 +1097,7 @@ function HeroSearch({ setPage, t }) {
 
 // HOME PAGE
 // ═══════════════════════════════════════════════════════════════════
-function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) {
+function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user, heroFilters, setHeroFilters }) {
   const featured = useMemo(() => PropertyService.list({}).filter(p => p.featured||p.nuevo).slice(0,3), []);
   return (
     <div className="page" style={{paddingTop:68}}>
@@ -1090,7 +1119,7 @@ function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) 
           </div>
         </div>
       </div>
-      <HeroSearch setPage={setPage} t={t}/>
+      <HeroSearch setPage={setPage} t={t} heroFilters={heroFilters} setHeroFilters={setHeroFilters}/>
       <div style={{padding:'5rem 2.5rem',maxWidth:1400,margin:'0 auto'}}>
         <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'2.5rem'}}>
           <div>
@@ -1623,6 +1652,7 @@ function App() {
   const [detailId, setDetailId] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [lang, setLang] = useState(() => localStorage.getItem('ruralvista_lang') || 'es');
+  const [heroFilters, setHeroFilters] = useState({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''});
   const { user, login, register, logout, isAdmin } = useAuth();
   const t = useT(lang);
   const [notifCount, setNotifCount] = useState(() => user ? NotifService.unreadCount(user.id) : 0);
@@ -1655,6 +1685,12 @@ function App() {
 
   const setPageSafe = useCallback(p => {
     if ((p==='admin') && !isAdmin) { addToast({icon:'🔒',msg:'Acceso restringido a administradores'}); return; }
+    if (p.startsWith('detail_from_search_')) {
+      const id = p.replace('detail_from_search_', '');
+      setDetailId(id);
+      setPage('detail');
+      return;
+    }
     setPage(p);
   }, [isAdmin]);
 
@@ -1672,8 +1708,8 @@ function App() {
         </div>
       )}
       <Navbar page={page} setPage={setPageSafe} favCount={favs.length} user={user} logout={logout} lang={lang} setLang={setLang} notifCount={notifCount} addToast={addToast} t={t}/>
-      {page==='home' && <HomePage setPage={setPageSafe} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} addToast={addToast} t={t} user={user}/>}
-      {page==='catalogue' && <CataloguePage favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
+      {page==='home' && <HomePage setPage={setPageSafe} favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} addToast={addToast} t={t} user={user} heroFilters={heroFilters} setHeroFilters={setHeroFilters}/>}
+      {page==='catalogue' && <CataloguePage favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPageSafe} addToast={addToast} t={t} user={user} heroFilters={heroFilters} setHeroFilters={setHeroFilters}/>}
       {page==='detail' && detailId && <DetailPage id={detailId} favs={favs} toggleFav={toggleFav} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
       {page==='favs' && <FavsPage favs={favs} toggleFav={toggleFav} setDetailId={setDetailId} setPage={setPageSafe} addToast={addToast} t={t} user={user}/>}
       {page==='auth' && <AuthPage login={login} register={register} setPage={setPageSafe} addToast={addToast} t={t} lang={lang}/>}
