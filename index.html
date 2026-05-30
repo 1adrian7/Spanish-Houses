@@ -1022,32 +1022,112 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
 function HeroSearch({ setPage, t, heroFilters, setHeroFilters }) {
   const form = heroFilters;
   const setForm = setHeroFilters;
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSugg, setShowSugg] = useState(false);
+  const inputRef = useRef(null);
+  const suggRef = useRef(null);
+
+  // Extraer todas las ubicaciones únicas de las propiedades
+  const allLocations = useMemo(() => {
+    const props = PropertyService.list({});
+    const locs = new Set();
+    props.forEach(p => {
+      if (p.location) {
+        locs.add(p.location);
+        // También añadir partes individuales (ciudad, barrio)
+        p.location.split(',').forEach(part => {
+          const trimmed = part.trim();
+          if (trimmed.length > 2) locs.add(trimmed);
+        });
+      }
+      if (p.district) locs.add(p.district);
+    });
+    return Array.from(locs).sort();
+  }, []);
+
+  const handleLocationChange = (val) => {
+    setForm({...form, location: val});
+    if (val.length >= 1) {
+      const filtered = allLocations.filter(loc =>
+        loc.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 6);
+      setSuggestions(filtered);
+      setShowSugg(filtered.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSugg(false);
+    }
+  };
+
+  const selectSuggestion = (loc) => {
+    setForm({...form, location: loc});
+    setSuggestions([]);
+    setShowSugg(false);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  // Cerrar al hacer clic fuera
+  useEffect(() => {
+    const handler = e => {
+      if (suggRef.current && !suggRef.current.contains(e.target) &&
+          inputRef.current && !inputRef.current.contains(e.target)) {
+        setShowSugg(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const handleSearch = () => {
-    // Si hay ID de propiedad busca directamente esa ficha
+    setShowSugg(false);
     if (form.propId.trim()) {
       const id = form.propId.replace(/^RV-0*/i, '');
       const prop = PropertyService.getById(id);
-      if (prop) {
-        setPage('detail_from_search_' + id);
-        return;
-      }
+      if (prop) { setPage('detail_from_search_' + id); return; }
     }
     setPage('catalogue');
   };
 
-  const fieldWrap = { display:'flex', flexDirection:'column', gap:6, flex:1, minWidth:0, padding:'1rem 1.5rem', borderRight:'1px solid var(--border)' };
-  const fieldLabel = { fontSize:10, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--warm-gray)', fontWeight:600 };
-  const fieldInput = { border:'none', background:'transparent', fontFamily:'inherit', fontSize:14, fontWeight:500, color:'var(--dark)', outline:'none', width:'100%', padding:0 };
-
   return (
     <div style={{background:'white',borderBottom:'1px solid var(--border)',boxShadow:'0 4px 24px rgba(37,99,168,0.08)'}}>
       <div style={{maxWidth:1400,margin:'0 auto',padding:'0.75rem 2.5rem'}}>
-        <div style={{background:'white',border:'1.5px solid rgba(37,99,168,0.18)',borderRadius:10,boxShadow:'0 2px 16px rgba(37,99,168,0.07)',display:'flex',alignItems:'stretch',overflow:'hidden'}}>
-          <div style={{display:'flex',flexDirection:'column',gap:5,flex:2,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6'}}>
+        <div style={{background:'white',border:'1.5px solid rgba(37,99,168,0.18)',borderRadius:10,boxShadow:'0 2px 16px rgba(37,99,168,0.07)',display:'flex',alignItems:'stretch',overflow:'visible'}}>
+
+          {/* Campo búsqueda con autocomplete */}
+          <div style={{display:'flex',flexDirection:'column',gap:5,flex:2,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',position:'relative'}}>
             <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Buscar</div>
-            <input style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',width:'100%',padding:0}} placeholder="Ciudad, zona, descripción..." value={form.location} onChange={e=>setForm({...form,location:e.target.value})} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
+            <input
+              ref={inputRef}
+              style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',width:'100%',padding:0}}
+              placeholder="Ciudad, zona, descripción..."
+              value={form.location}
+              onChange={e => handleLocationChange(e.target.value)}
+              onFocus={() => form.location && suggestions.length > 0 && setShowSugg(true)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') { handleSearch(); }
+                if (e.key === 'Escape') setShowSugg(false);
+              }}
+              autoComplete="off"
+            />
+            {/* Dropdown de sugerencias */}
+            {showSugg && (
+              <div ref={suggRef} style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,background:'white',border:'1px solid rgba(37,99,168,0.15)',borderRadius:8,boxShadow:'0 8px 24px rgba(37,99,168,0.12)',zIndex:50,overflow:'hidden'}}>
+                {suggestions.map((s, i) => (
+                  <div
+                    key={i}
+                    onMouseDown={() => selectSuggestion(s)}
+                    style={{padding:'0.6rem 1rem',fontSize:13,color:'var(--dark)',cursor:'pointer',display:'flex',alignItems:'center',gap:8,borderBottom: i < suggestions.length-1 ? '1px solid #F0F4FA' : 'none'}}
+                    onMouseOver={e => e.currentTarget.style.background='#EFF6FF'}
+                    onMouseOut={e => e.currentTarget.style.background='white'}
+                  >
+                    <span style={{color:'#2563A8',fontSize:12}}>📍</span>
+                    {s}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+
           <div style={{display:'flex',flexDirection:'column',gap:5,padding:'0.9rem 1.4rem',borderRight:'1px solid #E8EEF6',minWidth:130}}>
             <div style={{fontSize:10,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--warm-gray)',fontWeight:600}}>Tipo</div>
             <select style={{border:'none',background:'transparent',fontFamily:'inherit',fontSize:14,fontWeight:500,color:'var(--dark)',outline:'none',padding:0,cursor:'pointer',appearance:'none'}} value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
@@ -1085,7 +1165,7 @@ function HeroSearch({ setPage, t, heroFilters, setHeroFilters }) {
             <button onClick={handleSearch} style={{background:'var(--dark)',color:'white',border:'none',padding:'0.65rem 1.6rem',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',borderRadius:6,transition:'background 0.2s'}} onMouseOver={e=>e.currentTarget.style.background='#1A4F8A'} onMouseOut={e=>e.currentTarget.style.background='var(--dark)'}>
               Buscar
             </button>
-            <button onClick={()=>setForm({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''})} style={{background:'none',border:'none',fontSize:13,color:'var(--warm-gray)',cursor:'pointer',fontFamily:'inherit',padding:'0.65rem 0.4rem',borderRadius:6}}>
+            <button onClick={()=>{setForm({tipo:'',location:'',bedrooms:'',maxPrice:'',propId:''});setSuggestions([]);setShowSugg(false);}} style={{background:'none',border:'none',fontSize:13,color:'var(--warm-gray)',cursor:'pointer',fontFamily:'inherit',padding:'0.65rem 0.4rem',borderRadius:6}}>
               Limpiar
             </button>
           </div>
