@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 :root{--cream:#F8F9FB;--dark:#2563A8;--gold:#FFB347;--gold-light:#FFD49A;--warm-gray:#8A96A3;--border:rgba(37,99,168,0.12);--card-bg:#FFFFFF;--font-serif:'Outfit',sans-serif;--font-sans:'Plus Jakarta Sans',sans-serif;--shadow:0 2px 16px rgba(37,99,168,0.08);--shadow-lg:0 8px 40px rgba(37,99,168,0.12);--transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
@@ -887,111 +886,71 @@ function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, use
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// MAPA REAL (OpenStreetMap embed — sin CORS, siempre funciona)
+// MAPA REAL — muestra la zona sin ubicación exacta
 // ═══════════════════════════════════════════════════════════════════
 function RealMap({ location, t }) {
   const s = t?.search || {};
-  const [coords, setCoords] = useState(null);
+  const [iframeSrc, setIframeSrc] = useState(null);
   const [status, setStatus] = useState('loading');
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
 
   useEffect(() => {
     if (!location) return;
     setStatus('loading');
 
-    // Photon (Komoot) - geocodificador OSM sin restricciones CORS
+    // Photon geocoder — CORS abierto, devuelve coordenadas del pueblo/zona
     fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(location)}&limit=1&lang=es`)
       .then(r => r.json())
       .then(data => {
-        if (!data?.features?.length) { setStatus('error'); return; }
+        if (!data?.features?.length) throw new Error('no results');
         const [lon, lat] = data.features[0].geometry.coordinates;
-        setCoords({ lat, lon });
-        setStatus('ready');
+        // Zoom 13 = nivel pueblo, sin mostrar calles concretas ni marcador
+        const bbox = 0.04; // ~4km alrededor
+        const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-bbox},${lat-bbox},${lon+bbox},${lat+bbox}&layer=mapnik`;
+        setIframeSrc(src);
+        setStatus('ok');
       })
       .catch(() => {
-        // Fallback: intentar con Nominatim con headers correctos
-        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`, {
-          headers: { 'Accept': 'application/json' }
-        })
-          .then(r => r.json())
-          .then(data => {
-            if (!data?.length) { setStatus('error'); return; }
-            setCoords({ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) });
-            setStatus('ready');
-          })
-          .catch(() => setStatus('error'));
+        // Fallback: búsqueda directa por nombre en OSM sin coordenadas
+        const src = `https://www.openstreetmap.org/export/embed.html?bbox=-1.2,38.0,-0.8,38.3&layer=mapnik&marker=38.15,-1.0`;
+        setIframeSrc(`https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}`);
+        setStatus('fallback');
       });
   }, [location]);
 
-  useEffect(() => {
-    if (status !== 'ready' || !coords || !mapRef.current) return;
-    if (!window.L) { setTimeout(() => {}, 300); return; }
-
-    if (mapInstanceRef.current) {
-      try { mapInstanceRef.current.remove(); } catch(e) {}
-      mapInstanceRef.current = null;
-    }
-
-    try {
-      const map = window.L.map(mapRef.current, {
-        zoomControl: true,
-        scrollWheelZoom: false,
-      }).setView([coords.lat, coords.lon], 14);
-
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19,
-      }).addTo(map);
-
-      const icon = window.L.divIcon({
-        html: `<div style="background:#2563A8;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(37,99,168,0.4);"></div>`,
-        iconSize: [28, 28], iconAnchor: [14, 28], className: '',
-      });
-
-      window.L.marker([coords.lat, coords.lon], { icon })
-        .addTo(map)
-        .bindPopup(`<strong>${location}</strong>`)
-        .openPopup();
-
-      setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 250);
-      mapInstanceRef.current = map;
-      setStatus('ok');
-    } catch(e) {
-      setStatus('error');
-    }
-
-    return () => {
-      if (mapInstanceRef.current) {
-        try { mapInstanceRef.current.remove(); } catch(e) {}
-        mapInstanceRef.current = null;
-      }
-    };
-  }, [status, coords]);
-
   return (
     <div style={{border:'1px solid var(--border)',borderRadius:4,overflow:'hidden',marginBottom:'2rem'}}>
-      {(status === 'loading') && (
-        <div style={{height:280,display:'flex',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,gap:8}}>
+      {status === 'loading' && (
+        <div style={{height:300,display:'flex',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,gap:8}}>
           <span style={{animation:'spin 1s linear infinite',display:'inline-block',fontSize:18}}>⟳</span>
           {s.mapLoading||'Cargando mapa...'}
         </div>
       )}
-      {status === 'error' && (
-        <div style={{height:280,overflow:'hidden',position:'relative'}}>
-          <iframe
-            title="mapa"
-            width="100%" height="280"
-            frameBorder="0" scrolling="no"
-            style={{border:'none',display:'block'}}
-            src={`https://www.openstreetmap.org/export/embed.html?bbox=-1.5,37.5,-0.5,38.5&layer=mapnik&marker=38.0,-1.0`}
-          />
-          <div style={{position:'absolute',top:8,left:8,background:'rgba(255,255,255,0.9)',padding:'4px 10px',fontSize:12,borderRadius:4}}>
-            📍 {location}
-          </div>
+      {status === 'ok' && iframeSrc && (
+        <iframe
+          title={`Mapa ${location}`}
+          src={iframeSrc}
+          width="100%"
+          height="300"
+          frameBorder="0"
+          scrolling="no"
+          style={{display:'block',border:'none'}}
+          onLoad={() => {}}
+        />
+      )}
+      {status === 'fallback' && (
+        <div style={{height:300,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,gap:12}}>
+          <span style={{fontSize:32}}>📍</span>
+          <span style={{fontWeight:600,color:'var(--dark)',fontSize:14}}>{location}</span>
+          <a
+            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{fontSize:12,color:'var(--dark)',textDecoration:'underline'}}
+          >
+            Ver en OpenStreetMap →
+          </a>
         </div>
       )}
-      <div ref={mapRef} style={{height:280, width:'100%', display: status === 'ok' ? 'block' : 'none'}}/>
       <div style={{padding:'0.5rem 0.75rem',background:'var(--card-bg)',fontSize:11,color:'var(--warm-gray)',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',gap:6}}>
         <span>📍</span> {location}
       </div>
