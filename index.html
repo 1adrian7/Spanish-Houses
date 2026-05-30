@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>NOVA — Portal Inmobiliario</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>RURAL VISTA — Properties in Spain</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563A8'/%3E%3Cpolygon points='2,26 10,13 18,23' fill='white' opacity='0.95'/%3E%3Cpolygon points='14,26 22,15 32,26' fill='white' opacity='0.85'/%3E%3Ccircle cx='26' cy='9' r='4' fill='%23FFB347'/%3E%3Cline x1='26' y1='3' x2='26' y2='1' stroke='%23FFB347' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='26' y1='17' x2='26' y2='19' stroke='%23FFB347' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='20' y1='9' x2='18' y2='9' stroke='%23FFB347' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='32' y1='9' x2='34' y2='9' stroke='%23FFB347' stroke-width='1.5' stroke-linecap='round'/%3E%3C%2Fsvg%3E"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
-:root{--cream:#F5F0E8;--dark:#2C4A6E;--gold:#F59A4F;--gold-light:#FBCB9A;--warm-gray:#8B8480;--border:rgba(26,23,20,0.12);--card-bg:#FDFAF5;--font-serif:'Outfit',sans-serif;--font-sans:'Plus Jakarta Sans',sans-serif;
+:root{--cream:#F8F9FB;--dark:#2563A8;--gold:#FFB347;--gold-light:#FFD49A;--warm-gray:#8A96A3;--border:rgba(37,99,168,0.12);--card-bg:#FFFFFF;--font-serif:'Outfit',sans-serif;--font-sans:'Plus Jakarta Sans',sans-serif;--shadow:0 2px 16px rgba(37,99,168,0.08);--shadow-lg:0 8px 40px rgba(37,99,168,0.12);--transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);--success:#2D6A4F;--danger:#9B2C2C;}
+*{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
 #root{min-height:100vh;}
@@ -42,8 +44,8 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 @keyframes pageIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 /* HERO */
 .hero{height:calc(100vh - 68px);position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2E6BA8 0%,#2C5282 50%,#3A7BC8 100%);}
-.hero-grid{position:absolute;inset:0;opacity:0.04;background-image:linear-gradient(var(--cream) 1px,transparent 1px),linear-gradient(90deg,var(--cream) 1px,transparent 1px);background-size:60px 60px;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#7EC8F4 0%,#5AAEE8 40%,#82CFF8 100%);}
+.hero-grid{position:absolute;inset:0;opacity:0.18;background-image:linear-gradient(var(--cream) 1px,transparent 1px),linear-gradient(90deg,var(--cream) 1px,transparent 1px);background-size:60px 60px;}
 .hero-accent{position:absolute;top:20%;right:15%;width:320px;height:320px;border:1px solid rgba(201,168,76,0.2);border-radius:50%;animation:pulse 4s ease-in-out infinite;}
 .hero-accent2{position:absolute;top:20%;right:15%;width:240px;height:240px;border:1px solid rgba(201,168,76,0.12);border-radius:50%;animation:pulse 4s ease-in-out 1s infinite;}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.05);opacity:0.6;}}
@@ -308,7 +310,7 @@ const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 // ─── Utilidades JWT ─────────────────────────────────────────────────
 const JWT = {
-  sign(payload, secret = 'nova_jwt_secret_2025') {
+  sign(payload, secret = 'ruralvista_jwt_secret_2025') {
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
     const body = btoa(JSON.stringify({ ...payload, iat: Date.now(), exp: Date.now() + 7*24*60*60*1000 }));
     const sig = btoa(secret + body).substring(0, 20);
@@ -327,20 +329,20 @@ const JWT = {
 
 // ─── Base de datos simulada (localStorage) ─────────────────────────
 const DB = {
-  get: (k, def = []) => { try { return JSON.parse(localStorage.getItem('nova_'+k)) ?? def; } catch { return def; } },
-  set: (k, v) => { localStorage.setItem('nova_'+k, JSON.stringify(v)); },
+  get: (k, def = []) => { try { return JSON.parse(localStorage.getItem('ruralvista_'+k)) ?? def; } catch { return def; } },
+  set: (k, v) => { localStorage.setItem('ruralvista_'+k, JSON.stringify(v)); },
   init() {
     // Usuarios: solo se crean si no existen
     if (!this.get('users_init', false)) {
       this.set('users', [
-        { id: 'u1', name: 'Admin Nova', email: 'admin@nova.com', password: 'admin123', role: 'ADMIN', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
-        { id: 'u2', name: 'Elena Morales', email: 'elena@nova.com', password: 'agent123', role: 'AGENT', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
+        { id: 'u1', name: 'Admin Rural Vista', email: 'admin@ruralvista.com', password: 'admin123', role: 'ADMIN', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
+        { id: 'u2', name: 'Elena Morales', email: 'elena@ruralvista.com', password: 'agent123', role: 'AGENT', avatar: null, createdAt: new Date().toISOString(), lang: 'es' },
         { id: 'u3', name: 'James Wilson', email: 'james@gmail.com', password: 'user123', role: 'USER', avatar: null, createdAt: new Date().toISOString(), lang: 'en' },
       ]);
       this.set('users_init', true);
     }
     // Propiedades: solo se inicializan si NO hay ninguna guardada — preserva las creadas desde el admin
-    if (!localStorage.getItem('nova_properties')) {
+    if (!localStorage.getItem('ruralvista_properties')) {
       this.set('properties', INITIAL_PROPERTIES);
     }
     // Resto: solo la primera vez
@@ -353,9 +355,9 @@ const DB = {
       this.set('notifications', [
         { id: 'n1', userId: 'u1', type: 'new_contact', title: 'Nueva solicitud de visita', message: 'Sarah Thompson quiere visitar el Ático de lujo', read: false, createdAt: new Date(Date.now()-86400000).toISOString() },
         { id: 'n2', userId: 'u1', type: 'new_contact', title: 'Consulta de cliente', message: 'Klaus Müller pregunta por el chalet con piscina', read: false, createdAt: new Date(Date.now()-172800000).toISOString() },
-        { id: 'n3', userId: 'u1', type: 'system', title: 'Bienvenido a NOVA', message: 'Tu plataforma inmobiliaria está lista', read: true, createdAt: new Date(Date.now()-604800000).toISOString() },
+        { id: 'n3', userId: 'u1', type: 'system', title: 'Bienvenido a Rural Vista', message: 'Tu plataforma inmobiliaria está lista', read: true, createdAt: new Date(Date.now()-604800000).toISOString() },
       ]);
-      if (!localStorage.getItem('nova_favorites')) this.set('favorites', {});
+      if (!localStorage.getItem('ruralvista_favorites')) this.set('favorites', {});
       this.set('initialized', true);
     }
   },
@@ -379,7 +381,7 @@ const AuthService = {
     const { password: _, ...safeUser } = newUser;
     const token = JWT.sign({ id: newUser.id, email, role: 'USER', name });
     const notifs = DB.get('notifications');
-    DB.set('notifications', [...notifs, { id: 'n'+Date.now(), userId: newUser.id, type: 'welcome', title: '¡Bienvenido a NOVA!', message: 'Tu cuenta ha sido creada con éxito.', read: false, createdAt: new Date().toISOString() }]);
+    DB.set('notifications', [...notifs, { id: 'n'+Date.now(), userId: newUser.id, type: 'welcome', title: '¡Bienvenido a Rural Vista!', message: 'Tu cuenta ha sido creada con éxito.', read: false, createdAt: new Date().toISOString() }]);
     return { token, user: safeUser };
   },
   me(token) {
@@ -492,7 +494,7 @@ const UploadService = {
 const TRANSLATIONS = {
   es: {
     nav: { home:'Inicio', properties:'Propiedades', favorites:'Favoritos', services:'Servicios', contact:'Contacto', login:'Acceder', admin:'Admin', profile:'Mi perfil', logout:'Cerrar sesión' },
-    hero: { tag:'Portal Inmobiliario de Lujo · Valencia', title:'Tu próximo hogar,', titleEm:'extraordinario', subtitle:'Selección exclusiva de propiedades únicas en las mejores ubicaciones. Experiencia premium, resultados reales.', cta1:'Ver propiedades', cta2:'Hablar con un asesor', stat1:'+1.200', stat1l:'Propiedades', stat2:'98%', stat2l:'Satisfacción', stat3:'15', stat3l:'Años experiencia' },
+    hero: { tag:'Rural Properties in Spain', title:'Tu próximo hogar,', titleEm:'extraordinario', subtitle:'Encuentra tu casa ideal en la España rural. Propiedades auténticas, trato cercano y asesoramiento real desde la zona.', cta1:'Ver propiedades', cta2:'Hablar con un asesor', stat1:'+1.200', stat1l:'Propiedades', stat2:'98%', stat2l:'Satisfacción', stat3:'15', stat3l:'Años experiencia' },
     catalogue: { title:'Propiedades', subtitle:'disponibles', search:'Buscar', searchPh:'Ciudad, barrio, descripción...', type:'Tipo', all:'Todos', sale:'Venta', rent:'Alquiler', zone:'Zona', allZones:'Todas', maxPrice:'Precio máx.', noLimit:'Sin límite', minM2:'M² mínimo', apply:'Buscar', clear:'Limpiar', noResults:'Sin resultados', noResultsSub:'Prueba a modificar los filtros', showAll:'Ver todas las propiedades' },
     card: { detail:'Ver detalle', info:'Solicitar info', beds:'hab.', baths:'baños' },
     detail: { back:'Volver al catálogo', meters:'Metros', bedrooms:'Dormitorios', bathrooms:'Baños', floor:'Planta', description:'Descripción', features:'Características', location:'Ubicación', sale:'— VENTA —', rent:'— ALQUILER —', requestVisit:'Solicitar visita', saveProperty:'Guardar propiedad', savedProperty:'En favoritos', tour360:'Tour virtual 360°', included:'Incluido', notIncluded:'No incluido', garage:'Garaje', ref:'Ref.' },
@@ -503,7 +505,7 @@ const TRANSLATIONS = {
   },
   en: {
     nav: { home:'Home', properties:'Properties', favorites:'Favorites', services:'Services', contact:'Contact', login:'Sign in', admin:'Admin', profile:'My profile', logout:'Sign out' },
-    hero: { tag:'Luxury Real Estate Portal · Valencia', title:'Your next home,', titleEm:'extraordinary', subtitle:'Exclusive selection of unique properties in the best locations. Premium experience, real results.', cta1:'View properties', cta2:'Talk to an advisor', stat1:'+1,200', stat1l:'Properties', stat2:'98%', stat2l:'Satisfaction', stat3:'15', stat3l:'Years experience' },
+    hero: { tag:'Rural Properties in Spain', title:'Your next home,', titleEm:'extraordinary', subtitle:'Find your ideal home in rural Spain. Authentic properties, personal service and real local expertise.', cta1:'View properties', cta2:'Talk to an advisor', stat1:'+1,200', stat1l:'Properties', stat2:'98%', stat2l:'Satisfaction', stat3:'15', stat3l:'Years experience' },
     catalogue: { title:'Properties', subtitle:'available', search:'Search', searchPh:'City, neighbourhood, description...', type:'Type', all:'All', sale:'For sale', rent:'For rent', zone:'Area', allZones:'All areas', maxPrice:'Max. price', noLimit:'No limit', minM2:'Min. sqm', apply:'Search', clear:'Clear', noResults:'No results', noResultsSub:'Try adjusting your filters', showAll:'View all properties' },
     card: { detail:'View details', info:'Request info', beds:'beds', baths:'baths' },
     detail: { back:'Back to catalogue', meters:'Sqm', bedrooms:'Bedrooms', bathrooms:'Bathrooms', floor:'Floor', description:'Description', features:'Features', location:'Location', sale:'— FOR SALE —', rent:'— FOR RENT —', requestVisit:'Request a viewing', saveProperty:'Save property', savedProperty:'Saved', tour360:'Virtual 360° tour', included:'Included', notIncluded:'Not included', garage:'Garage', ref:'Ref.' },
@@ -514,7 +516,7 @@ const TRANSLATIONS = {
   },
   de: {
     nav: { home:'Startseite', properties:'Immobilien', favorites:'Favoriten', services:'Dienstleistungen', contact:'Kontakt', login:'Anmelden', admin:'Admin', profile:'Mein Profil', logout:'Abmelden' },
-    hero: { tag:'Luxus-Immobilienportal · Valencia', title:'Ihr nächstes Zuhause,', titleEm:'außergewöhnlich', subtitle:'Exklusive Auswahl einzigartiger Immobilien in besten Lagen. Premium-Erfahrung, echte Ergebnisse.', cta1:'Immobilien ansehen', cta2:'Berater kontaktieren', stat1:'+1.200', stat1l:'Immobilien', stat2:'98%', stat2l:'Zufriedenheit', stat3:'15', stat3l:'Jahre Erfahrung' },
+    hero: { tag:'Rural Properties in Spain', title:'Ihr nächstes Zuhause,', titleEm:'außergewöhnlich', subtitle:'Finden Sie Ihr Traumhaus im ländlichen Spanien. Authentische Immobilien und persönliche Beratung vor Ort.', cta1:'Immobilien ansehen', cta2:'Berater kontaktieren', stat1:'+1.200', stat1l:'Immobilien', stat2:'98%', stat2l:'Zufriedenheit', stat3:'15', stat3l:'Jahre Erfahrung' },
     catalogue: { title:'Immobilien', subtitle:'verfügbar', search:'Suchen', searchPh:'Stadt, Viertel, Beschreibung...', type:'Typ', all:'Alle', sale:'Kauf', rent:'Miete', zone:'Zone', allZones:'Alle', maxPrice:'Max. Preis', noLimit:'Kein Limit', minM2:'Min. m²', apply:'Suchen', clear:'Zurücksetzen', noResults:'Keine Ergebnisse', noResultsSub:'Filter anpassen', showAll:'Alle Immobilien' },
     card: { detail:'Details', info:'Info anfragen', beds:'Zi.', baths:'Bäder' },
     detail: { back:'Zurück', meters:'m²', bedrooms:'Schlafzimmer', bathrooms:'Badezimmer', floor:'Etage', description:'Beschreibung', features:'Ausstattung', location:'Lage', sale:'— KAUF —', rent:'— MIETE —', requestVisit:'Besichtigung anfragen', saveProperty:'Merken', savedProperty:'Gemerkt', tour360:'Virtueller 360°-Rundgang', included:'Inklusive', notIncluded:'Nicht inklusive', garage:'Garage', ref:'Ref.' },
@@ -525,7 +527,7 @@ const TRANSLATIONS = {
   },
   nl: {
     nav: { home:'Startpagina', properties:'Woningen', favorites:'Favorieten', services:'Diensten', contact:'Contact', login:'Inloggen', admin:'Admin', profile:'Mijn profiel', logout:'Uitloggen' },
-    hero: { tag:'Luxe Vastgoedportaal · Valencia', title:'Uw volgende thuis,', titleEm:'buitengewoon', subtitle:'Exclusieve selectie van unieke woningen op de beste locaties. Premium ervaring, echte resultaten.', cta1:'Woningen bekijken', cta2:'Spreek met adviseur', stat1:'+1.200', stat1l:'Woningen', stat2:'98%', stat2l:'Tevredenheid', stat3:'15', stat3l:'Jaar ervaring' },
+    hero: { tag:'Rural Properties in Spain', title:'Uw volgende thuis,', titleEm:'buitengewoon', subtitle:'Vind uw ideale woning in landelijk Spanje. Authentieke woningen en persoonlijk advies ter plaatse.', cta1:'Woningen bekijken', cta2:'Spreek met adviseur', stat1:'+1.200', stat1l:'Woningen', stat2:'98%', stat2l:'Tevredenheid', stat3:'15', stat3l:'Jaar ervaring' },
     catalogue: { title:'Woningen', subtitle:'beschikbaar', search:'Zoeken', searchPh:'Stad, wijk, omschrijving...', type:'Type', all:'Alles', sale:'Koop', rent:'Huur', zone:'Zone', allZones:'Alles', maxPrice:'Max. prijs', noLimit:'Geen limiet', minM2:'Min. m²', apply:'Zoeken', clear:'Wissen', noResults:'Geen resultaten', noResultsSub:'Pas de filters aan', showAll:'Alle woningen' },
     card: { detail:'Bekijk details', info:'Info aanvragen', beds:'slaapk.', baths:'badk.' },
     detail: { back:'Terug naar catalogus', meters:'m²', bedrooms:'Slaapkamers', bathrooms:'Badkamers', floor:'Verdieping', description:'Beschrijving', features:'Kenmerken', location:'Locatie', sale:'— KOOP —', rent:'— HUUR —', requestVisit:'Bezichtiging aanvragen', saveProperty:'Opslaan', savedProperty:'Opgeslagen', tour360:'Virtuele 360° tour', included:'Inbegrepen', notIncluded:'Niet inbegrepen', garage:'Garage', ref:'Ref.' },
@@ -557,16 +559,16 @@ DB.init();
 // HOOKS
 // ═══════════════════════════════════════════════════════════════════
 function useAuth() {
-  const [token, setToken] = useState(() => localStorage.getItem('nova_token'));
+  const [token, setToken] = useState(() => localStorage.getItem('ruralvista_token'));
   const [user, setUser] = useState(() => {
-    const t = localStorage.getItem('nova_token');
+    const t = localStorage.getItem('ruralvista_token');
     return t ? AuthService.me(t) : null;
   });
 
   const login = useCallback((email, password) => {
     const res = AuthService.login(email, password);
     if (res.error) return res;
-    localStorage.setItem('nova_token', res.token);
+    localStorage.setItem('ruralvista_token', res.token);
     setToken(res.token);
     setUser(res.user);
     return res;
@@ -575,14 +577,14 @@ function useAuth() {
   const register = useCallback((name, email, password, lang) => {
     const res = AuthService.register(name, email, password, lang);
     if (res.error) return res;
-    localStorage.setItem('nova_token', res.token);
+    localStorage.setItem('ruralvista_token', res.token);
     setToken(res.token);
     setUser(res.user);
     return res;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('nova_token');
+    localStorage.removeItem('ruralvista_token');
     setToken(null);
     setUser(null);
   }, []);
@@ -607,18 +609,32 @@ function ToastContainer({ toasts }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// LANG SELECTOR
+// LANG SELECTOR — dropdown
 // ═══════════════════════════════════════════════════════════════════
 function LangSelector({ lang, setLang }) {
-  const langs = ['es','en','de','nl'];
+  const [open, setOpen] = useState(false);
   const flags = { es:'🇪🇸', en:'🇬🇧', de:'🇩🇪', nl:'🇳🇱' };
+  const labels = { es:'ES', en:'EN', de:'DE', nl:'NL' };
+  const ref = useRef(null);
+  useEffect(() => {
+    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
   return (
-    <div className="lang-selector">
-      {langs.map(l => (
-        <button key={l} className={`lang-btn ${lang === l ? 'active' : ''}`} onClick={() => setLang(l)}>
-          {flags[l]} {l.toUpperCase()}
-        </button>
-      ))}
+    <div ref={ref} style={{position:'relative'}}>
+      <button onClick={() => setOpen(o => !o)} style={{display:'flex',alignItems:'center',gap:6,background:'none',border:'1px solid var(--border)',padding:'5px 10px',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:12,color:'var(--dark)',fontWeight:600,transition:'var(--transition)'}}>
+        {flags[lang]} {labels[lang]} <span style={{fontSize:9,opacity:0.5}}>▾</span>
+      </button>
+      {open && (
+        <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,background:'white',border:'1px solid var(--border)',boxShadow:'var(--shadow)',zIndex:300,minWidth:100,overflow:'hidden'}}>
+          {Object.entries(flags).map(([code, flag]) => (
+            <button key={code} onClick={() => { setLang(code); setOpen(false); }} style={{display:'flex',alignItems:'center',gap:8,width:'100%',padding:'8px 14px',background:lang===code?'var(--cream)':'none',border:'none',cursor:'pointer',fontFamily:'var(--font-sans)',fontSize:13,color:'var(--dark)',fontWeight:lang===code?600:400,textAlign:'left'}}>
+              {flag} {labels[code]}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -639,8 +655,23 @@ function Navbar({ page, setPage, favCount, user, logout, lang, setLang, notifCou
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-logo" onClick={() => setPage('home')}>
-        <div className="nav-logo-dot"/>
-        NOVA
+        <svg width="162" height="38" viewBox="0 0 162 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="38" height="38" rx="7" fill="#2563A8"/>
+          <polygon points="19,3 35,14 35,36 3,36 3,14" fill="#1A4F8A"/>
+          <polygon points="19,2 37,15 1,15" fill="white" opacity="0.95"/>
+          <rect x="13" y="21" width="12" height="15" fill="white" opacity="0.55"/>
+          <rect x="5" y="18" width="7" height="7" rx="1" fill="white" opacity="0.8"/>
+          <rect x="26" y="18" width="7" height="7" rx="1" fill="white" opacity="0.8"/>
+          <circle cx="30" cy="8" r="4" fill="#FFB347"/>
+          <line x1="30" y1="2" x2="30" y2="0" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <line x1="30" y1="14" x2="30" y2="16" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <line x1="24" y1="8" x2="22" y2="8" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <line x1="36" y1="8" x2="38" y2="8" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <line x1="26" y1="4" x2="24.5" y2="2.5" stroke="#FFB347" strokeWidth="1.2" strokeLinecap="round"/>
+          <line x1="34" y1="4" x2="35.5" y2="2.5" stroke="#FFB347" strokeWidth="1.2" strokeLinecap="round"/>
+          <text x="46" y="22" fontFamily="'Playfair Display','Georgia',serif" fontSize="14" fontWeight="700" fill="#2563A8" letterSpacing="1.5">RURAL VISTA</text>
+          <text x="46" y="33" fontFamily="'Plus Jakarta Sans',sans-serif" fontSize="7" fontWeight="500" fill="#8A96A3" letterSpacing="2.5">PROPERTIES IN SPAIN</text>
+        </svg>
       </div>
       <div className="nav-links">
         <button className={`nav-link ${page==='home'?'active':''}`} onClick={() => setPage('home')}>{t.nav.home}</button>
@@ -963,7 +994,7 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.bedrooms}</span><span className="detail-info-value">{prop.hab}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.bathrooms}</span><span className="detail-info-value">{prop.banos}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">{t.detail.garage}</span><span className="detail-info-value">{prop.parking?t.detail.included:t.detail.notIncluded}</span></div>
-              <div className="detail-info-row"><span className="detail-info-label">{t.detail.ref}</span><span className="detail-info-value">NV-{String(prop.id).padStart(4,'0')}</span></div>
+              <div className="detail-info-row"><span className="detail-info-label">{t.detail.ref}</span><span className="detail-info-value">RV-{String(prop.id).padStart(4,'0')}</span></div>
               <div className="detail-info-row"><span className="detail-info-label">👁 Visitas</span><span className="detail-info-value">{prop.views||0}</span></div>
             </div>
           </div>
@@ -974,6 +1005,62 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// HERO SEARCH
+function HeroSearch({ setPage, t }) {
+  const [form, setForm] = useState({ tipo:'', location:'', bedrooms:'', maxPrice:'', propId:'' });
+  const handleSearch = () => {
+    setPage('catalogue');
+  };
+  const selStyle = { flex:1, minWidth:130, background:'white', border:'none', borderRight:'1px solid #E5EAF0', padding:'0 1rem', fontFamily:'inherit', fontSize:13, color:'#2563A8', cursor:'pointer', outline:'none', appearance:'none', height:'100%' };
+  const inputStyle = { flex:1, minWidth:120, background:'white', border:'none', borderRight:'1px solid #E5EAF0', padding:'0 1rem', fontFamily:'inherit', fontSize:13, color:'#2563A8', outline:'none', height:'100%' };
+  return (
+    <div style={{marginTop:'2rem'}}>
+      <div style={{background:'white',borderRadius:8,boxShadow:'0 8px 32px rgba(37,99,168,0.18)',overflow:'hidden',display:'flex',flexWrap:'wrap',height:56,maxWidth:820}}>
+        <div style={{display:'flex',flexDirection:'column',justifyContent:'center',borderRight:'1px solid #E5EAF0',padding:'0 1rem',minWidth:110,flexShrink:0}}>
+          <div style={{fontSize:9,letterSpacing:'0.18em',textTransform:'uppercase',color:'#8A96A3',fontWeight:600,marginBottom:2}}>Buscando</div>
+          <select style={selStyle} value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
+            <option value="">Tipo de propiedad</option>
+            <option value="venta">En venta</option>
+            <option value="alquiler">En alquiler</option>
+          </select>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',justifyContent:'center',borderRight:'1px solid #E5EAF0',padding:'0 1rem',flex:1,minWidth:120}}>
+          <div style={{fontSize:9,letterSpacing:'0.18em',textTransform:'uppercase',color:'#8A96A3',fontWeight:600,marginBottom:2}}>Ubicación</div>
+          <input style={inputStyle} placeholder="Todas las ciudades" value={form.location} onChange={e=>setForm({...form,location:e.target.value})}/>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',justifyContent:'center',borderRight:'1px solid #E5EAF0',padding:'0 1rem',minWidth:130,flexShrink:0}}>
+          <div style={{fontSize:9,letterSpacing:'0.18em',textTransform:'uppercase',color:'#8A96A3',fontWeight:600,marginBottom:2}}>Tamaño de la propiedad</div>
+          <select style={selStyle} value={form.bedrooms} onChange={e=>setForm({...form,bedrooms:e.target.value})}>
+            <option value="">Dormitorios</option>
+            <option value="1">1+ dormitorio</option>
+            <option value="2">2+ dormitorios</option>
+            <option value="3">3+ dormitorios</option>
+            <option value="4">4+ dormitorios</option>
+          </select>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',justifyContent:'center',borderRight:'1px solid #E5EAF0',padding:'0 1rem',minWidth:130,flexShrink:0}}>
+          <div style={{fontSize:9,letterSpacing:'0.18em',textTransform:'uppercase',color:'#8A96A3',fontWeight:600,marginBottom:2}}>Tu presupuesto</div>
+          <select style={selStyle} value={form.maxPrice} onChange={e=>setForm({...form,maxPrice:e.target.value})}>
+            <option value="">Precio máximo</option>
+            <option value="100000">100.000 €</option>
+            <option value="200000">200.000 €</option>
+            <option value="350000">350.000 €</option>
+            <option value="500000">500.000 €</option>
+            <option value="1000000">1.000.000 €</option>
+          </select>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',justifyContent:'center',borderRight:'1px solid #E5EAF0',padding:'0 1rem',minWidth:110,flexShrink:0}}>
+          <div style={{fontSize:9,letterSpacing:'0.18em',textTransform:'uppercase',color:'#8A96A3',fontWeight:600,marginBottom:2}}>ID de propiedad</div>
+          <input style={{...inputStyle,borderRight:'none'}} placeholder="ID de propiedad" value={form.propId} onChange={e=>setForm({...form,propId:e.target.value})}/>
+        </div>
+        <button onClick={handleSearch} style={{background:'#2563A8',color:'white',border:'none',padding:'0 2rem',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit',flexShrink:0,transition:'background 0.2s'}} onMouseOver={e=>e.target.style.background='#1A4F8A'} onMouseOut={e=>e.target.style.background='#2563A8'}>
+          Buscar
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // HOME PAGE
 // ═══════════════════════════════════════════════════════════════════
 function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) {
@@ -987,8 +1074,8 @@ function HomePage({ setPage, favs, toggleFav, setDetailId, addToast, t, user }) 
           <div className="hero-tag">{t.hero.tag}</div>
           <h1 className="hero-title">{t.hero.title}<br/><em>{t.hero.titleEm}</em></h1>
           <p className="hero-subtitle">{t.hero.subtitle}</p>
-          <div className="hero-actions">
-            <button className="btn-hero btn-hero-primary" onClick={() => setPage('catalogue')}>{t.hero.cta1}</button>
+          <HeroSearch setPage={setPage} t={t}/>
+          <div className="hero-actions" style={{marginTop:'1.5rem'}}>
             <button className="btn-hero btn-hero-outline" onClick={() => addToast({icon:'📞',msg:t.toast.callBack,gold:true})}>{t.hero.cta2}</button>
           </div>
           <div className="hero-stats">
@@ -1100,7 +1187,7 @@ function AuthPage({ login, register, setPage, addToast, t, lang }) {
           )}
         </div>
         <div style={{marginTop:'1.5rem',padding:'1rem',background:'rgba(201,168,76,0.08)',border:'1px solid rgba(201,168,76,0.2)',fontSize:12,color:'var(--warm-gray)'}}>
-          <strong style={{color:'var(--dark)'}}>Demo:</strong> admin@nova.com / admin123 · elena@nova.com / agent123 · james@gmail.com / user123
+          <strong style={{color:'var(--dark)'}}>Demo:</strong> admin@ruralvista.com / admin123 · elena@ruralvista.com / agent123 · james@gmail.com / user123
         </div>
       </div>
     </div>
@@ -1351,7 +1438,7 @@ function AdminPanel({ user, setPage, addToast }) {
       <div className="admin-layout">
         <div className="admin-sidebar">
           <div style={{padding:'0 1.5rem 1rem',borderBottom:'1px solid rgba(245,240,232,0.1)',marginBottom:'0.5rem'}}>
-            <div style={{fontFamily:'var(--font-serif)',fontSize:18,fontWeight:300,color:'var(--cream)',letterSpacing:'0.1em'}}>NOVA Admin</div>
+            <div style={{fontFamily:'var(--font-serif)',fontSize:18,fontWeight:700,color:'var(--cream)',letterSpacing:'0.05em'}}>Rural Vista Admin</div>
             <div style={{fontSize:11,color:'rgba(245,240,232,0.4)',marginTop:4}}>{user.email}</div>
           </div>
           <div className="admin-sidebar-title">Panel</div>
@@ -1407,7 +1494,7 @@ function AdminPanel({ user, setPage, addToast }) {
                   <tbody>
                     {properties.map(p => (
                       <tr key={p.id}>
-                        <td style={{fontSize:11,color:'var(--warm-gray)'}}>NV-{String(p.id).padStart(4,'0')}</td>
+                        <td style={{fontSize:11,color:'var(--warm-gray)'}}>RV-{String(p.id).padStart(4,'0')}</td>
                         <td style={{maxWidth:200,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontWeight:500}}>{p.title}</td>
                         <td><span style={{textTransform:'capitalize',fontSize:11}}>{p.tipo}</span></td>
                         <td style={{color:'var(--dark)',fontWeight:500}}>{p.priceLabel}</td>
@@ -1442,7 +1529,7 @@ function AdminPanel({ user, setPage, addToast }) {
                       <tr key={c.id}>
                         <td style={{fontWeight:500}}>{c.name}</td>
                         <td style={{fontSize:12,color:'var(--warm-gray)'}}>{c.email}</td>
-                        <td style={{fontSize:12}}>{c.propertyId ? `NV-${String(c.propertyId).padStart(4,'0')}` : '—'}</td>
+                        <td style={{fontSize:12}}>{c.propertyId ? `RV-${String(c.propertyId).padStart(4,'0')}` : '—'}</td>
                         <td style={{textTransform:'capitalize',fontSize:11}}>{c.tipo}</td>
                         <td style={{fontSize:12,textTransform:'uppercase'}}>{c.language||'es'}</td>
                         <td>
@@ -1529,19 +1616,19 @@ function App() {
   const [page, setPage] = useState('home');
   const [detailId, setDetailId] = useState(null);
   const [toasts, setToasts] = useState([]);
-  const [lang, setLang] = useState(() => localStorage.getItem('nova_lang') || 'es');
+  const [lang, setLang] = useState(() => localStorage.getItem('ruralvista_lang') || 'es');
   const { user, login, register, logout, isAdmin } = useAuth();
   const t = useT(lang);
   const [notifCount, setNotifCount] = useState(() => user ? NotifService.unreadCount(user.id) : 0);
 
   const favs = useMemo(() => {
-    if (!user) return JSON.parse(localStorage.getItem('nova_guest_favs') || '[]');
+    if (!user) return JSON.parse(localStorage.getItem('ruralvista_guest_favs') || '[]');
     return FavService.get(user.id);
   }, [user, page]);
 
   useEffect(() => { setTimeout(() => setLoading(false), 2000); }, []);
   useEffect(() => { window.scrollTo({top:0,behavior:'smooth'}); }, [page]);
-  useEffect(() => { localStorage.setItem('nova_lang', lang); }, [lang]);
+  useEffect(() => { localStorage.setItem('ruralvista_lang', lang); }, [lang]);
   useEffect(() => { if (user) setNotifCount(NotifService.unreadCount(user.id)); }, [user, page]);
 
   const addToast = useCallback(t => {
@@ -1554,9 +1641,9 @@ function App() {
     if (user) {
       FavService.toggle(user.id, propId);
     } else {
-      const gf = JSON.parse(localStorage.getItem('nova_guest_favs')||'[]');
+      const gf = JSON.parse(localStorage.getItem('ruralvista_guest_favs')||'[]');
       const updated = gf.includes(propId) ? gf.filter(f=>f!==propId) : [...gf, propId];
-      localStorage.setItem('nova_guest_favs', JSON.stringify(updated));
+      localStorage.setItem('ruralvista_guest_favs', JSON.stringify(updated));
     }
   }, [user]);
 
@@ -1569,9 +1656,25 @@ function App() {
     <>
       {loading && (
         <div className="loader-overlay">
-          <div className="loader-logo">NOVA</div>
+        <svg width="200" height="52" viewBox="0 0 200 52" fill="none" xmlns="http://www.w3.org/2000/svg" style={{opacity:0,animation:'logoReveal 0.8s ease 0.3s forwards'}}>
+          <rect width="52" height="52" rx="9" fill="#2563A8"/>
+          <polygon points="26,4 46,18 46,48 6,48 6,18" fill="#1A4F8A"/>
+          <polygon points="26,2 50,18 2,18" fill="white" opacity="0.95"/>
+          <rect x="18" y="28" width="16" height="20" fill="white" opacity="0.55"/>
+          <rect x="7" y="22" width="10" height="10" rx="1" fill="white" opacity="0.8"/>
+          <rect x="35" y="22" width="10" height="10" rx="1" fill="white" opacity="0.8"/>
+          <circle cx="40" cy="10" r="5.5" fill="#FFB347"/>
+          <line x1="40" y1="2" x2="40" y2="0" stroke="#FFB347" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="40" y1="18" x2="40" y2="21" stroke="#FFB347" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="32" y1="10" x2="29" y2="10" stroke="#FFB347" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="48" y1="10" x2="51" y2="10" stroke="#FFB347" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="34.5" y1="4.5" x2="32.5" y2="2.5" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <line x1="45.5" y1="4.5" x2="47.5" y2="2.5" stroke="#FFB347" strokeWidth="1.4" strokeLinecap="round"/>
+          <text x="62" y="30" fontFamily="'Playfair Display','Georgia',serif" fontSize="20" fontWeight="700" fill="white" letterSpacing="2">RURAL VISTA</text>
+          <text x="62" y="45" fontFamily="'Plus Jakarta Sans',sans-serif" fontSize="9" fontWeight="500" fill="rgba(255,255,255,0.55)" letterSpacing="3">PROPERTIES IN SPAIN</text>
+        </svg>
           <div className="loader-line"/>
-          <div className="loader-sub">Portal Inmobiliario</div>
+          <div className="loader-sub">Rural Properties · Spain</div>
         </div>
       )}
       <Navbar page={page} setPage={setPageSafe} favCount={favs.length} user={user} logout={logout} lang={lang} setLang={setLang} notifCount={notifCount} addToast={addToast} t={t}/>
