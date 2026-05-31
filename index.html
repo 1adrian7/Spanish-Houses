@@ -84,10 +84,10 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--dark);min-
 .filter-btn-clear:hover{border-color:var(--dark);color:var(--dark);}
 /* CARDS */
 .properties-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
-.property-card{background:var(--card-bg);border:1px solid var(--border);cursor:pointer;overflow:hidden;transition:var(--transition);animation:cardIn 0.5s ease both;}
+.property-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;overflow:hidden;transition:var(--transition);animation:cardIn 0.5s ease both;}
 .property-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--gold-light);}
 @keyframes cardIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.card-img-wrap{position:relative;height:220px;overflow:hidden;background:#2C2318;}
+.card-img-wrap{position:relative;height:220px;overflow:hidden;background:#2C2318;border-radius:8px 8px 0 0;}
 .card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform 0.6s ease;font-size:60px;}
 .property-card:hover .card-img-placeholder{transform:scale(1.04);}
 .card-badge{position:absolute;top:16px;left:16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 12px;font-weight:500;}
@@ -300,6 +300,7 @@ textarea.admin-form-input{resize:vertical;min-height:90px;}
 
 @media(max-width:900px){
   .detail-grid,.admin-layout,.profile-grid{grid-template-columns:1fr;}
+  .detail-sidebar{order:-1;}
   .navbar{padding:0 1rem;}
   .nav-links{display:none;}
   .catalogue,.detail-page,.favs-page,.profile-page{padding:2rem 1rem;}
@@ -823,6 +824,31 @@ function VisitModal({ property, onClose, addToast, t, user }) {
 // ═══════════════════════════════════════════════════════════════════
 function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, index, t, user }) {
   const isFav = favs.includes(prop.id);
+  const isAdmin = user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'AGENT');
+
+  const handleQuickPhoto = (e) => {
+    e.stopPropagation();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = async (ev) => {
+      const files = Array.from(ev.target.files);
+      const urls = await Promise.all(files.map(f => new Promise(res => {
+        const reader = new FileReader();
+        reader.onload = r => res(r.target.result);
+        reader.readAsDataURL(f);
+      })));
+      const existing = (prop.imgs || []).filter(i => i && (i.startsWith('data:') || i.startsWith('http')));
+      const merged = [...existing, ...urls];
+      PropertyService.update(prop.id, { ...prop, imgs: merged });
+      addToast({ icon: '📸', msg: `${files.length} foto${files.length>1?'s':''} añadida${files.length>1?'s':''}`, gold: true });
+      // Force re-render by updating localStorage timestamp
+      localStorage.setItem('ruralvista_lastupdate', Date.now());
+    };
+    input.click();
+  };
+
   return (
     <div className="property-card" style={{animationDelay:`${index*0.07}s`}} onClick={() => { setDetailId(prop.id); setPage('detail'); }}>
       <div className="card-img-wrap">
@@ -833,7 +859,11 @@ function PropertyCard({ prop, favs, toggleFav, setDetailId, setPage, addToast, i
         )}
         <span className={`card-badge badge-${prop.badge==='nuevo'?'nuevo':prop.badge}`}>{prop.badge==='venta'?t.catalogue.sale:prop.badge==='alquiler'?t.catalogue.rent:'Nuevo'}</span>
         <button className={`card-fav ${isFav?'active':''}`} onClick={e => { e.stopPropagation(); toggleFav(prop.id); addToast(isFav?{icon:'💔',msg:t.toast.removed}:{icon:'❤️',msg:t.toast.saved,gold:true}); }}>{isFav?'❤️':'🤍'}</button>
-        {prop.has360 && <div className="card-360">360°</div>}
+        {isAdmin && (
+          <button onClick={handleQuickPhoto} title="Añadir fotos" style={{position:'absolute',bottom:8,right:8,background:'rgba(0,0,0,0.55)',color:'white',border:'none',borderRadius:6,padding:'5px 8px',fontSize:14,cursor:'pointer',lineHeight:1}}>
+            📸
+          </button>
+        )}
       </div>
       <div className="card-body">
         <div className="card-price">{prop.priceLabel}</div>
@@ -942,7 +972,7 @@ function CataloguePage({ favs, toggleFav, setDetailId, setPage, addToast, t, use
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// MAPA REAL — muestra la zona sin ubicación exacta
+// MAPA REAL — muestra la zona sin ubicación exacta, sin redirecciones
 // ═══════════════════════════════════════════════════════════════════
 function RealMap({ location, t }) {
   const s = t?.search || {};
@@ -953,23 +983,31 @@ function RealMap({ location, t }) {
     if (!location) return;
     setStatus('loading');
 
-    // Photon geocoder — CORS abierto, devuelve coordenadas del pueblo/zona
     fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(location)}&limit=1&lang=es`)
       .then(r => r.json())
       .then(data => {
         if (!data?.features?.length) throw new Error('no results');
         const [lon, lat] = data.features[0].geometry.coordinates;
-        // Zoom 13 = nivel pueblo, sin mostrar calles concretas ni marcador
-        const bbox = 0.04; // ~4km alrededor
-        const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-bbox},${lat-bbox},${lon+bbox},${lat+bbox}&layer=mapnik`;
+        const bbox = 0.04;
+        const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-bbox}%2C${lat-bbox}%2C${lon+bbox}%2C${lat+bbox}&layer=mapnik`;
         setIframeSrc(src);
         setStatus('ok');
       })
       .catch(() => {
-        // Fallback: búsqueda directa por nombre en OSM sin coordenadas
-        const src = `https://www.openstreetmap.org/export/embed.html?bbox=-1.2,38.0,-0.8,38.3&layer=mapnik&marker=38.15,-1.0`;
-        setIframeSrc(`https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}`);
-        setStatus('fallback');
+        // Fallback: busca sin transformaciones, usa coordenadas genéricas de España
+        // Intentamos con la API de nominatim como segundo intento
+        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data?.length) { setStatus('error'); return; }
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            const bbox = 0.04;
+            const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-bbox}%2C${lat-bbox}%2C${lon+bbox}%2C${lat+bbox}&layer=mapnik`;
+            setIframeSrc(src);
+            setStatus('ok');
+          })
+          .catch(() => setStatus('error'));
       });
   }, [location]);
 
@@ -981,6 +1019,12 @@ function RealMap({ location, t }) {
           {s.mapLoading||'Cargando mapa...'}
         </div>
       )}
+      {status === 'error' && (
+        <div style={{height:300,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',gap:8}}>
+          <span style={{fontSize:32}}>📍</span>
+          <span style={{fontWeight:600,color:'var(--dark)'}}>{location}</span>
+        </div>
+      )}
       {status === 'ok' && iframeSrc && (
         <iframe
           title={`Mapa ${location}`}
@@ -989,23 +1033,8 @@ function RealMap({ location, t }) {
           height="300"
           frameBorder="0"
           scrolling="no"
-          style={{display:'block',border:'none'}}
-          onLoad={() => {}}
+          style={{display:'block',border:'none',pointerEvents:'none'}}
         />
-      )}
-      {status === 'fallback' && (
-        <div style={{height:300,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#EFF6FF',color:'var(--warm-gray)',fontSize:13,gap:12}}>
-          <span style={{fontSize:32}}>📍</span>
-          <span style={{fontWeight:600,color:'var(--dark)',fontSize:14}}>{location}</span>
-          <a
-            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{fontSize:12,color:'var(--dark)',textDecoration:'underline'}}
-          >
-            Ver en OpenStreetMap →
-          </a>
-        </div>
       )}
       <div style={{padding:'0.5rem 0.75rem',background:'var(--card-bg)',fontSize:11,color:'var(--warm-gray)',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',gap:6}}>
         <span>📍</span> {location}
@@ -1474,6 +1503,64 @@ function NotificationsPage({ user, onNotifRead }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// CLOUDINARY URL INPUT
+function CloudinaryUrlInput({ uploadedImgs, setUploadedImgs }) {
+  const [urlInput, setUrlInput] = useState('');
+  const [error, setError] = useState('');
+
+  const addUrl = () => {
+    const url = urlInput.trim();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      setError('La URL debe empezar por http:// o https://');
+      return;
+    }
+    if (uploadedImgs.some(i => i.url === url)) {
+      setError('Esta URL ya está añadida');
+      return;
+    }
+    setUploadedImgs(prev => [...prev, { url, name: url.split('/').pop() }]);
+    setUrlInput('');
+    setError('');
+  };
+
+  return (
+    <div>
+      <div style={{fontSize:12,color:'var(--warm-gray)',marginBottom:8}}>
+        Pega la URL de Cloudinary de cada imagen y pulsa <strong>Añadir</strong>. Puedes añadir varias.
+      </div>
+      <div style={{display:'flex',gap:8,marginBottom:8}}>
+        <input
+          className="admin-form-input"
+          style={{flex:1}}
+          placeholder="https://res.cloudinary.com/..."
+          value={urlInput}
+          onChange={e=>{setUrlInput(e.target.value);setError('');}}
+          onKeyDown={e=>e.key==='Enter'&&addUrl()}
+        />
+        <button className="admin-btn admin-btn-sm" onClick={addUrl} style={{flexShrink:0}}>
+          + Añadir
+        </button>
+      </div>
+      {error && <div style={{color:'var(--danger)',fontSize:12,marginBottom:8}}>{error}</div>}
+      {uploadedImgs.length > 0 && (
+        <div>
+          <div style={{fontSize:12,color:'var(--warm-gray)',marginBottom:6}}>{uploadedImgs.length} imagen{uploadedImgs.length>1?'es':''} añadida{uploadedImgs.length>1?'s':''}:</div>
+          <div className="upload-preview">
+            {uploadedImgs.map((img,i) => (
+              <div key={i} className="upload-thumb" style={{position:'relative'}}>
+                <img src={img.url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex';}}/>
+                <div style={{display:'none',position:'absolute',inset:0,background:'#EFF6FF',alignItems:'center',justifyContent:'center',fontSize:10,color:'var(--warm-gray)',padding:4,textAlign:'center'}}>Error cargando imagen</div>
+                <button className="upload-thumb-del" onClick={()=>setUploadedImgs(prev=>prev.filter((_,j)=>j!==i))}>×</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ADMIN PANEL
 // ═══════════════════════════════════════════════════════════════════
 function AdminPanel({ user, setPage, addToast }) {
@@ -1607,21 +1694,8 @@ function AdminPanel({ user, setPage, addToast }) {
                 <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,cursor:'pointer'}}><input type="checkbox" checked={propForm.nuevo} onChange={e=>setPropForm({...propForm,nuevo:e.target.checked})}/> Nuevo</label>
               </div>
               <div className="admin-form-group">
-                <label className="admin-form-label">📸 Subir imágenes (S3 simulado)</label>
-                <div className="upload-zone" onClick={() => document.getElementById('fileInput').click()} onDragOver={e=>{e.preventDefault();e.currentTarget.classList.add('drag-over');}} onDragLeave={e=>e.currentTarget.classList.remove('drag-over')} onDrop={e=>{e.preventDefault();e.currentTarget.classList.remove('drag-over');handleFileUpload(e.dataTransfer.files);}}>
-                  <input id="fileInput" type="file" accept="image/*" multiple onChange={e=>handleFileUpload(e.target.files)}/>
-                  {uploading ? <div>⏳ Subiendo a S3...</div> : <div style={{color:'var(--warm-gray)',fontSize:13}}>Arrastra imágenes aquí o haz clic para seleccionar<br/><small>Simula subida a S3/Cloudflare R2</small></div>}
-                </div>
-                {uploadedImgs.length > 0 && (
-                  <div className="upload-preview">
-                    {uploadedImgs.map((img,i) => (
-                      <div key={i} className="upload-thumb">
-                        <img src={img.url} alt={img.name} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-                        <button className="upload-thumb-del" onClick={() => setUploadedImgs(prev=>prev.filter((_,j)=>j!==i))}>×</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <label className="admin-form-label">📸 Imágenes (URLs de Cloudinary)</label>
+                <CloudinaryUrlInput uploadedImgs={uploadedImgs} setUploadedImgs={setUploadedImgs}/>
               </div>
               <div style={{display:'flex',gap:'1rem',marginTop:'0.5rem'}}>
                 <button className="admin-btn" style={{flex:1}} onClick={handleSaveProp}>{editProp?'Guardar cambios':'Crear propiedad'}</button>
