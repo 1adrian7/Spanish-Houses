@@ -1067,7 +1067,7 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
       <div className="detail-page">
         <button className="detail-back" onClick={() => setPage('catalogue')}>← {t.detail.back}</button>
         <div className="detail-grid">
-          <div style={{order:1}}>
+          <div style={{order:1,width:'100%',overflow:'hidden'}}>
             <div className="gallery-main">
               <div className="gallery-main-img" style={{background:prop.bgColor}}>
                 {prop.imgs[imgIndex] && (prop.imgs[imgIndex].startsWith('data:') || prop.imgs[imgIndex].startsWith('http')) ? (
