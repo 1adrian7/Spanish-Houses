@@ -1049,6 +1049,13 @@ function RealMap({ location, t }) {
 function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
   const [prop, setProp] = useState(() => PropertyService.getById(id));
   const [imgIndex, setImgIndex] = useState(0);
+  const thumbsRef = useRef(null);
+
+  useEffect(() => {
+    if (!thumbsRef.current) return;
+    const thumb = thumbsRef.current.children[imgIndex];
+    if (thumb) thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [imgIndex]);
   const [showVisit, setShowVisit] = useState(false);
   const isFav = favs.includes(prop?.id);
 
@@ -1080,7 +1087,7 @@ function DetailPage({ id, favs, toggleFav, setPage, addToast, t, user }) {
               <button className="gallery-nav gallery-next" onClick={nextImg}>›</button>
               <div className="gallery-counter">{imgIndex+1} / {prop.imgs.length}</div>
             </div>
-            <div className="gallery-thumbs">
+            <div className="gallery-thumbs" ref={thumbsRef}>
               {prop.imgs.map((img,i) => (
                 <div key={i} className={`gallery-thumb ${imgIndex===i?'active':''}`} style={{background:prop.bgColor}} onClick={() => setImgIndex(i)}>
                   {img && (img.startsWith('data:') || img.startsWith('http')) ? (
